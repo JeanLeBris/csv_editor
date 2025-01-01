@@ -33,7 +33,7 @@ void Set_Default_Config(config_type config, char *exe_path){
     strcpy(config->input_mode, "");
     strcpy(config->input_file, "");
 
-    Get_Window_Size(config);
+    Set_Window_Size(config);
 }
 
 void Load_Config(config_type config){
@@ -160,13 +160,18 @@ void Get_Config_From_Args(config_type config, int argc, char **argv){
     }
 }
 
-void Get_Window_Size(config_type config){
+void Get_Window_Size(int *columns, int *rows){
     CONSOLE_SCREEN_BUFFER_INFO csbi;
-    int columns, rows;
 
     GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+    *columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    *rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
+}
+
+void Set_Window_Size(config_type config){
+    int columns, rows;
+
+    Get_Window_Size(&columns, &rows);
 
     // printf("columns: %d\n", columns);
     // printf("rows: %d\n", rows);

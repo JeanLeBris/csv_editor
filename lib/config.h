@@ -34,7 +34,8 @@ typedef struct config_type{
 void Set_Default_Config(config_type config, char *exe_path);
 void Load_Config(config_type config);
 void Get_Config_From_Args(config_type config, int argc, char **argv);
-void Get_Window_Size(config_type config);
+void Get_Window_Size(int *columns, int *rows);
+void Set_Window_Size(config_type config);
 void Set_Max_Table_Length(config_type config);
 void Print_Config(config_type config);
 
