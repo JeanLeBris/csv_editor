@@ -22,7 +22,7 @@ int main(int argc, char **argv){
     table_type table_object = malloc(sizeof(*table_object));
     Fetch_Data_From_Csv(table_object, config, 0, -1, -1, -1);
     table_object->first_line_printed = 0;
-    table_object->fixed_column = 0;
+    table_object->first_column_printed = 0;
     table_object->active_line = -2;
     table_object->active_column = -1;
     table_object->first_character_printed = -1;

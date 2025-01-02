@@ -8,9 +8,11 @@
 typedef struct table_type{
     char **header;
     char ***table;
-    int active_line;
-    int active_column;
+    int active_line;    // id of displayed row (as in memory)
+    int active_column;  // id of displayed column (not as it is in memory)
     int character_highlighted;
+    int first_column_printed;   // id of the first displayed column (not as it is in memory)
+    int last_column_printed;
     int first_line_printed;
     int last_line_printed;
     int first_line_in_memory;
@@ -18,9 +20,10 @@ typedef struct table_type{
     int first_character_printed;
     int on_file_begin;
     int on_file_end;
-    int fixed_column;
     int *cell_width;
     int *columns_order_of_display;
+
+    char command[101];
 
     int table_length;
     int table_width;
