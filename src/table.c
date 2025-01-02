@@ -836,7 +836,8 @@ void S_Print_Table(table_type table_object, config_type config){
     for(int i= table_object->table_length; i < max_lines_to_print; i++){
         strcat(output, "\n");
     }
-    strcat(output, "\n : ");
+    strcat(output, "\n");
+    strcat(output, table_object->command);
 
     Clear_Screen();
     printf("%s", output);
