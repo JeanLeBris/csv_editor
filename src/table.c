@@ -4,7 +4,7 @@
 #include <assert.h>
 #include "../lib/table.h"
 
-void Get_File_Characteristics(table_type table_object, config_type config, char sep){
+void Get_File_Characteristics(table_type table_object, config_type config){
     FILE *f = fopen(config->input_file, "r");
     if(f == NULL){
         printf("file error\n");
@@ -20,7 +20,7 @@ void Get_File_Characteristics(table_type table_object, config_type config, char 
             // printf(line);
             if(i == 0){
                 for(int j = 0; j < strlen(line); j++){
-                    if(line[j] == sep)
+                    if(line[j] == config->input_separator)
                         col_num++;
                 }
                 table_object->table_width = col_num;
@@ -39,8 +39,8 @@ void Get_File_Characteristics(table_type table_object, config_type config, char 
 }
 
 void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_in_file, int end_in_file, int start_to_replace, int memory_to_replace){
-    char sep = ',';
-    Get_File_Characteristics(table_object, config, sep);
+    // char sep = ';'; // Follows the RFC 4180, to change later to accept other separators
+    Get_File_Characteristics(table_object, config);
     FILE *f = fopen(config->input_file, "r");
     if(f == NULL){
         printf("file error\n");
@@ -71,19 +71,14 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 }
                 col_num = 0;
                 for(int j = 0; j < strlen(line); j++){
-                    if(line[j] == sep){
+                    if(line[j] == config->input_separator){
                         table_object->header[col_num][in_cell_iterator] = '\0';
                         table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
                         // printf("%s\n", table_object->header[col_num]);
                         col_num++;
                         in_cell_iterator = 0;
                     }
-                    else if(line[j] == '\n'){
-                        table_object->header[col_num][in_cell_iterator] = '\0';
-                        table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
-                        // printf("%s\n", table_object->header[col_num]);
-                    }
-                    else if(line[j] == '\0'){
+                    else if((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0'){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
                         table_object->header[col_num][in_cell_iterator] = '\0';
                         table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
                         // printf("%s\n", table_object->header[col_num]);
@@ -115,7 +110,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 col_num = 0;
                 in_cell_iterator = 0;
                 for(int j = 0; j < strlen(line) + 1; j++){  // +1 to be sure of getting a '\0' character
-                    if(line[j] == sep){
+                    if(line[j] == config->input_separator){
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
@@ -123,13 +118,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                         col_num++;
                         in_cell_iterator = 0;
                     }
-                    else if(line[j] == '\n'){
-                        table_object->table[line_num][col_num][in_cell_iterator] = '\0';
-                        if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
-                            table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
-                        // printf("%s\n", table_object->table[line_num][col_num]);
-                    }
-                    else if(line[j] == '\0'){
+                    else if((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0'){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
@@ -434,13 +423,14 @@ void S_Print_Table(table_type table_object, config_type config){
     char *output = (char*)malloc(config->window_length * config->window_width * 2 * sizeof(char));
     strcpy(output, "\0");
     // output[0] = "\0";
+    int width_of_cell_changed = 0;
     int difference = 0;
-    char char_buffer[2] = " ";
+    char char_buffer[10] = " ";
     int width_counter = 0;
     // Clear_Screen();
     int amount_of_rows_reserved_for_content_other_than_rows = 5;    // the header is not considered a row
     int max_lines_to_print = config->window_length - amount_of_rows_reserved_for_content_other_than_rows;
-    int sum = config->window_length + 1;
+    int sum = 0;
     int iteration_limit = 10;
     int iterator = 0;
     if(table_object->active_line < table_object->first_line_printed && table_object->active_line >= 0){
@@ -449,8 +439,21 @@ void S_Print_Table(table_type table_object, config_type config){
     else if(table_object->active_line > table_object->first_line_printed + max_lines_to_print - 1){
         table_object->first_line_printed = table_object->active_line - max_lines_to_print + 1;
     }
+    if(table_object->character_highlighted != -1){
+        if(table_object->active_line == -1){
+            if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1 > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1;
+                width_of_cell_changed = 1;
+            }
+        }
+        else{
+            if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) + 1 > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) + 1;
+                width_of_cell_changed = 1;
+            }
+        }
+    }
     sum = config->window_width + 1;
-    iteration_limit = 10;
     iterator = 0;
     while(sum > config->window_width && iterator < iteration_limit){
         sum = 1;
@@ -479,6 +482,57 @@ void S_Print_Table(table_type table_object, config_type config){
             table_object->first_column_printed--;
         }
         iterator++;
+    }
+    // sum = config->focused_cell_max_width + 1;
+    if(table_object->character_highlighted > -1){
+        if(table_object->active_column > -1 && table_object->active_line == -1){
+            if(table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
+                // table_object->first_character_printed = 1;
+                if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
+                    table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+                }
+                else{
+                    table_object->first_character_printed = 0;
+                }
+            }
+            else if(table_object->character_highlighted < table_object->first_character_printed){
+                table_object->first_character_printed = table_object->character_highlighted;
+            }
+            else if(table_object->character_highlighted > table_object->first_character_printed + config->focused_cell_max_width - 1){
+                table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+            }
+        }
+        else if(table_object->active_column > -1 && table_object->active_line > -1){
+            if(table_object->character_highlighted == strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])){
+                // table_object->first_character_printed = 1;
+                if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
+                    table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+                }
+                else{
+                    table_object->first_character_printed = 0;
+                }
+            }
+            else if(table_object->character_highlighted < table_object->first_character_printed){
+                table_object->first_character_printed = table_object->character_highlighted;
+            }
+            else if(table_object->character_highlighted > table_object->first_character_printed + config->focused_cell_max_width - 1){
+                table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+            }
+        }
+
+        // if(table_object->active_column > -1 && table_object->active_line > -2){
+        //     if(table_object->character_highlighted - table_object->first_character_printed + 1 > config->focused_cell_max_width){
+        //         if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
+        //             table_object->first_character_printed = table_object->character_highlighted + 1 - config->focused_cell_max_width;
+        //         }
+        //         else{
+        //             table_object->first_character_printed = 0;
+        //         }
+        //     }
+        //     else if(table_object->character_highlighted - table_object->first_character_printed + 1 < 1){
+        //         table_object->first_character_printed = table_object->character_highlighted;
+        //     }
+        // }
     }
 
     // Header part
@@ -539,12 +593,19 @@ void S_Print_Table(table_type table_object, config_type config){
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
-        if(i == table_object->active_column){
-            if(table_object->active_line == -1 || table_object->active_line == -2){
+        if(i == table_object->active_column){   // if header is in active column
+            if(table_object->character_highlighted == -1 && (table_object->active_line == -1 || table_object->active_line == -2)){
                 S_Selection_Content_Colors(config, output);
             }
-            if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){
-                difference = table_object->cell_width[table_object->columns_order_of_display[i]] - strlen(table_object->header[table_object->columns_order_of_display[i]]);
+            if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){   // if cell width of header fits in displayed cell
+                if(table_object->active_line != -1 || (table_object->character_highlighted < (int)strlen(table_object->header[table_object->columns_order_of_display[i]]))){ // strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])
+                    difference = table_object->cell_width[table_object->columns_order_of_display[i]] - strlen(table_object->header[table_object->columns_order_of_display[i]]);
+                }
+                else{
+                    difference = table_object->cell_width[table_object->columns_order_of_display[i]] - strlen(table_object->header[table_object->columns_order_of_display[i]]) - 1;
+                }
+                // sprintf(char_buffer, "%d", (int)strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]));
+                // strcat(output, char_buffer);
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
                     strcat(output, " ");
                     width_counter++;
@@ -552,36 +613,86 @@ void S_Print_Table(table_type table_object, config_type config){
                 // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                     char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                    if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                        S_Selection_Content_Colors(config, output);
+                    }
                     strcat(output, char_buffer);
+                    if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                        S_Default_Colors(config, output);
+                    }
                     width_counter++;
                 }
+                if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
+                    S_Selection_Content_Colors(config, output);
+                    strcat(output, " ");
+                    S_Default_Colors(config, output);
+                }
             }
-            else{
-                difference = config->focused_cell_max_width - strlen(table_object->header[table_object->columns_order_of_display[i]]);
+            else{   // if cell width of header doesn't fit in displayed cell
+                if(table_object->active_line != -1 || (table_object->character_highlighted < (int)strlen(table_object->header[table_object->columns_order_of_display[i]]))){
+                    difference = config->focused_cell_max_width - strlen(table_object->header[table_object->columns_order_of_display[i]]);
+                }
+                else{
+                    difference = config->focused_cell_max_width - strlen(table_object->header[table_object->columns_order_of_display[i]]) - 1;
+                }
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
                     strcat(output, " ");
                     width_counter++;
                 }
-                if(difference < 0){
-                    for(int j = 0; j < config->focused_cell_max_width && width_counter < config->window_width; j++){
-                        char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
-                        strcat(output, char_buffer);
-                        // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
-                        width_counter++;
+                if(difference < 0){ // if header width doesn't fit in displayed cell
+                    // if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
+                    if(table_object->active_line == -1 && table_object->character_highlighted != -1){
+                        for(int j = table_object->first_character_printed; j < table_object->first_character_printed + config->focused_cell_max_width && width_counter < config->window_width; j++){
+                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                            if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                                S_Selection_Content_Colors(config, output);
+                            }
+                            strcat(output, char_buffer);
+                            if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                                S_Default_Colors(config, output);
+                            }
+                            // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
+                            width_counter++;
+                        }
+                    }
+                    else{
+                        for(int j = 0; j < config->focused_cell_max_width && width_counter < config->window_width; j++){
+                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                            // if(j == table_object->character_highlighted){
+                            //     S_Selection_Content_Colors(config, output);
+                            // }
+                            strcat(output, char_buffer);
+                            // if(j == table_object->character_highlighted){
+                            //     S_Default_Colors(config, output);
+                            // }
+                            // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
+                            width_counter++;
+                        }
                     }
                 }
-                else{
+                else{   // if header width fits in displayed cell
                     // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                     for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                         char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                        if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                            S_Selection_Content_Colors(config, output);
+                        }
                         strcat(output, char_buffer);
+                        if(table_object->active_line == -1 && j == table_object->character_highlighted){
+                            S_Default_Colors(config, output);
+                        }
                         width_counter++;
                     }
+                }
+                if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
+                    S_Selection_Content_Colors(config, output);
+                    strcat(output, " ");
+                    S_Default_Colors(config, output);
                 }
             }
             S_Default_Colors(config, output);
         }
-        else{
+        else{   // if header not in active column
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
                 difference = table_object->cell_width[table_object->columns_order_of_display[i]] - strlen(table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
@@ -690,12 +801,17 @@ void S_Print_Table(table_type table_object, config_type config){
         strcat(output, "|");
         width_counter++;
         for(int j = table_object->first_column_printed; j < table_object->table_width; j++){
-            if(j == table_object->active_column){
-                if(table_object->active_line == i || table_object->active_line == -2){
+            if(j == table_object->active_column){   // if cell in active column
+                if(table_object->character_highlighted == -1 && (table_object->active_line == i || table_object->active_line == -2)){
                     S_Selection_Content_Colors(config, output);
                 }
-                if(table_object->cell_width[table_object->columns_order_of_display[j]] < config->focused_cell_max_width){
-                    difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
+                if(table_object->cell_width[table_object->columns_order_of_display[j]] < config->focused_cell_max_width){   // if cell width of cell fits in displayed cell
+                    if(i != table_object->active_line || (table_object->character_highlighted < (int)strlen(table_object->table[i][table_object->columns_order_of_display[j]]))){
+                        difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
+                    }
+                    else{
+                        difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]) - 1;
+                    }
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
                         strcat(output, " ");
                         width_counter++;
@@ -703,31 +819,89 @@ void S_Print_Table(table_type table_object, config_type config){
                     // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                         char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
+                        if(table_object->active_line == i && k == table_object->character_highlighted){
+                            S_Selection_Content_Colors(config, output);
+                        }
                         strcat(output, char_buffer);
+                        if(table_object->active_line == i && k == table_object->character_highlighted){
+                            if((i + 1)%2 == 0){
+                                S_Even_Line_Colors(config, output);
+                            }
+                            else{
+                                S_Odd_Line_Colors(config, output);
+                            }
+                        }
                         width_counter++;
                     }
+                    if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
+                        S_Selection_Content_Colors(config, output);
+                        strcat(output, " ");
+                        S_Default_Colors(config, output);
+                    }
                 }
-                else{
-                    difference = config->focused_cell_max_width - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
+                else{   // if cell width of cell doesn't fit in displayed cell
+                    if(i != table_object->active_line || (table_object->character_highlighted < (int)strlen(table_object->table[i][table_object->columns_order_of_display[j]]))){
+                        difference = config->focused_cell_max_width - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
+                    }
+                    else{
+                        difference = config->focused_cell_max_width - strlen(table_object->table[i][table_object->columns_order_of_display[j]]) - 1;
+                    }
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
                         strcat(output, " ");
                         width_counter++;
                     }
-                    if(difference < 0){
-                        for(int k = 0; k < config->focused_cell_max_width && width_counter < config->window_width; k++){
-                            char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
-                            strcat(output, char_buffer);
-                            // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
-                            width_counter++;
+                    if(difference < 0){ // if cell width doesn't fit in displayed cell
+                        if(i == table_object->active_line && table_object->character_highlighted != -1){
+                            for(int k = table_object->first_character_printed; k < table_object->first_character_printed + config->focused_cell_max_width && width_counter < config->window_width; k++){
+                                char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
+                                if(table_object->active_line == i && k == table_object->character_highlighted){
+                                    S_Selection_Content_Colors(config, output);
+                                }
+                                strcat(output, char_buffer);
+                                if(table_object->active_line == i && k == table_object->character_highlighted){
+                                    if((i + 1)%2 == 0){
+                                        S_Even_Line_Colors(config, output);
+                                    }
+                                    else{
+                                        S_Odd_Line_Colors(config, output);
+                                    }
+                                }
+                                // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
+                                width_counter++;
+                            }
+                        }
+                        else{
+                            for(int k = 0; k < config->focused_cell_max_width && width_counter < config->window_width; k++){
+                                char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
+                                strcat(output, char_buffer);
+                                // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
+                                width_counter++;
+                            }
                         }
                     }
-                    else{
+                    else{   // if cell width fits in displayed cell
                         // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                         for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                             char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
+                            if(table_object->active_line == i && k == table_object->character_highlighted){
+                                S_Selection_Content_Colors(config, output);
+                            }
                             strcat(output, char_buffer);
+                            if(table_object->active_line == i && k == table_object->character_highlighted){
+                                if((i + 1)%2 == 0){
+                                    S_Even_Line_Colors(config, output);
+                                }
+                                else{
+                                    S_Odd_Line_Colors(config, output);
+                                }
+                            }
                             width_counter++;
                         }
+                    }
+                    if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
+                        S_Selection_Content_Colors(config, output);
+                        strcat(output, " ");
+                        S_Default_Colors(config, output);
                     }
                 }
                 // Default_Colors(config);
@@ -738,7 +912,7 @@ void S_Print_Table(table_type table_object, config_type config){
                     S_Odd_Line_Colors(config, output);
                 }
             }
-            else{
+            else{   // if cell not in active column
                 if(table_object->cell_width[table_object->columns_order_of_display[j]] < config->unfocused_cell_max_width){
                     difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
@@ -837,8 +1011,19 @@ void S_Print_Table(table_type table_object, config_type config){
         strcat(output, "\n");
     }
     strcat(output, "\n");
+    // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
+    // strcat(output, char_buffer);
     strcat(output, table_object->command);
-
+    
+    if(table_object->character_highlighted != -1 && width_of_cell_changed){
+        if(table_object->active_line == -1){
+            table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
+        }
+        else{
+            table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+        }
+    }
+    
     Clear_Screen();
     printf("%s", output);
     free(output);

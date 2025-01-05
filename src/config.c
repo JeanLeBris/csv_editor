@@ -29,6 +29,8 @@ void Set_Default_Config(config_type config, char *exe_path){
     config->unfocused_cell_max_width = 30;
     config->focused_cell_max_width = 30;
     config->cell_max_width = 100;
+    config->input_separator = ',';
+    config->output_separator = ',';
 
     strcpy(config->input_mode, "");
     strcpy(config->input_file, "");
@@ -139,6 +141,11 @@ void Load_Config(config_type config){
             config->cell_max_width = atoi(strtok(NULL, seps));
             // printf("%s\n", config->cell_max_width);
         }
+        else if(strcmp(fragmented_line, "csv_default_separator") == 0){
+            config->input_separator = strtok(NULL, seps)[0];
+            config->output_separator = config->input_separator;
+            // printf("%c\n", config->separator);
+        }
     }
     fclose(f);
 }
@@ -220,6 +227,8 @@ void Print_Config(config_type config){
     printf("Session config :\n");
     printf("\tInput mode : %s\n", config->input_mode);
     printf("\tInput file : %s\n", config->input_file);
+    printf("\tInput separator : %c\n", config->input_separator);
+    printf("\tOutput separator : %c\n", config->output_separator);
     printf("Window specifications :\n");
     printf("\tWindow width : %d\n", config->window_width);
     printf("\tWindow length : %d\n", config->window_length);

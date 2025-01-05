@@ -23,6 +23,8 @@ typedef struct config_type{
     int focused_cell_max_width;
     int cell_max_width;
     int max_table_length;
+    char input_separator;
+    char output_separator;
 
     char input_mode[10];
     char input_file[50];
