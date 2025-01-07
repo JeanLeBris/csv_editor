@@ -8,7 +8,7 @@
 typedef struct table_type{
     char **header;
     char ***table;
-    int active_line;    // id of displayed row (as in memory)
+    int active_line;    // id of displayed row (as in memory but not as in the file)
     int active_column;  // id of displayed column (not as it is in memory)
     int character_highlighted;
     int first_column_printed;   // id of the first displayed column (not as it is in memory)

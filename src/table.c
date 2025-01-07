@@ -14,7 +14,7 @@ void Get_File_Characteristics(table_type table_object, config_type config){
     int line_num = 0;
     char *line = malloc((config->file_line_max_length + 1) * sizeof(*line));
     int i = 0;
-    while(!feof(f) && i < config->file_max_length){
+    while(!feof(f) && (config->file_max_length == -1 || i < config->file_max_length)){
         line = fgets(line, config->file_line_max_length + 1, f);
         if(line != NULL){
             // printf(line);
@@ -52,7 +52,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     char *line = malloc((config->file_line_max_length + 1) * sizeof(*line));
     int i = 0;
     // printf("%d,%d\n", table_object->table_length, table_object->table_width);
-    while(!feof(f) && i < config->file_max_length){
+    while(!feof(f) && (config->file_max_length == -1 || i < config->file_max_length)){
         line = fgets(line, config->file_line_max_length + 1, f);
         if(line != NULL){
             // printf(line);
@@ -433,8 +433,13 @@ void S_Print_Table(table_type table_object, config_type config){
     int sum = 0;
     int iteration_limit = 10;
     int iterator = 0;
-    if(table_object->active_line < table_object->first_line_printed && table_object->active_line >= 0){
-        table_object->first_line_printed = table_object->active_line;
+    if(table_object->active_line < table_object->first_line_printed){
+        if(table_object->active_line >= 0){
+            table_object->first_line_printed = table_object->active_line;
+        }
+        else{
+            table_object->first_line_printed = 0;
+        }
     }
     else if(table_object->active_line > table_object->first_line_printed + max_lines_to_print - 1){
         table_object->first_line_printed = table_object->active_line - max_lines_to_print + 1;

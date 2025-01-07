@@ -37,6 +37,7 @@ int main(int argc, char **argv){
     int window_rows_buffer = 0;
     char *string_buffer = malloc((config->cell_max_width + 1) * sizeof(char));
     int command_string_size = 101;
+    char *command_buffer = NULL;
 
 
     while(running){
@@ -213,8 +214,10 @@ int main(int argc, char **argv){
                     }
                 }
                 else if(state == COMMAND_STATE){
-                    if(c == 27){
+                    if(c == 27){    // ESC
+                        table_object->command[0] = '\0';
                         state = REGULAR_STATE;
+                        break;
                     }
                     else if(c == -32){
                         c = getch();
@@ -235,7 +238,21 @@ int main(int argc, char **argv){
                         if(strcmp(table_object->command, ":q") == 0){
                             running = 0;
                         }
+                        else if(strstr(table_object->command, ":jump ") == table_object->command){
+                            command_buffer = strstr(table_object->command, ":jump ") + strlen(":jump ");
+                            buffer = atoi(command_buffer) - 1;
+                            if(buffer < -1){
+                                table_object->active_line = -2;
+                            }
+                            else if(buffer > table_object->table_length - 1){
+                                table_object->active_line = table_object->table_length - 1;
+                            }
+                            else{
+                                table_object->active_line = buffer;
+                            }
+                        }
                         table_object->command[0] = '\0';
+                        state = REGULAR_STATE;
                         break;
                     }
                     else if(c == 8){    // backspace
