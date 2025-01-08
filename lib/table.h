@@ -24,6 +24,7 @@ typedef struct table_type{
     int *columns_order_of_display;
 
     char command[101];
+    int command_character_highlighted;
 
     int table_length;
     int table_width;

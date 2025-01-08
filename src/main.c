@@ -38,6 +38,7 @@ int main(int argc, char **argv){
     char *string_buffer = malloc((config->cell_max_width + 1) * sizeof(char));
     int command_string_size = 101;
     char *command_buffer = NULL;
+    table_object->command_character_highlighted = -1;
 
 
     while(running){
@@ -65,6 +66,8 @@ int main(int argc, char **argv){
                     }
                     else if(c == 27){
                         state = COMMAND_STATE;
+                        table_object->command_character_highlighted = 0;
+                        break;
                     }
                     else if(c == -32){
                         c = getch();
@@ -100,6 +103,8 @@ int main(int argc, char **argv){
                     }
                     else if(c == 27){
                         state = COMMAND_STATE;
+                        table_object->command_character_highlighted = 0;
+                        break;
                     }
                     else if(c == -32){
                         c = getch();
@@ -216,6 +221,7 @@ int main(int argc, char **argv){
                 else if(state == COMMAND_STATE){
                     if(c == 27){    // ESC
                         table_object->command[0] = '\0';
+                        table_object->command_character_highlighted = -1;
                         state = REGULAR_STATE;
                         break;
                     }
@@ -228,10 +234,16 @@ int main(int argc, char **argv){
                             
                         }
                         else if(c == 75){   // Left
-                            
+                            if(table_object->command_character_highlighted > 0){
+                                table_object->command_character_highlighted--;
+                                break;
+                            }
                         }
                         else if(c == 77){   // Right
-                            
+                            if(table_object->command_character_highlighted < strlen(table_object->command)){
+                                table_object->command_character_highlighted++;
+                                break;
+                            }
                         }
                     }
                     else if(c == 13){   // enter
@@ -252,19 +264,34 @@ int main(int argc, char **argv){
                             }
                         }
                         table_object->command[0] = '\0';
+                        table_object->command_character_highlighted = -1;
                         state = REGULAR_STATE;
                         break;
                     }
                     else if(c == 8){    // backspace
-                        if(strlen(table_object->command) > 0){
-                            table_object->command[strlen(table_object->command) - 1] = '\0';
+                        // if(strlen(table_object->command) > 0){
+                        //     table_object->command[strlen(table_object->command) - 1] = '\0';
+                        //     table_object->command_character_highlighted--;
+                        //     break;
+                        // }
+                        if(table_object->command_character_highlighted > 0){
+                            for(int i = table_object->command_character_highlighted - 1; i < strlen(table_object->command); i++){
+                                table_object->command[i] = table_object->command[i + 1];
+                            }
+                            table_object->command_character_highlighted--;
                             break;
                         }
                     }
                     else{
                         if(strlen(table_object->command) < command_string_size - 1){
-                            table_object->command[strlen(table_object->command) + 1] = '\0';
-                            table_object->command[strlen(table_object->command)] = c;
+                            // table_object->command[strlen(table_object->command) + 1] = '\0';
+                            // table_object->command[strlen(table_object->command)] = c;
+                            // table_object->command_character_highlighted++;
+                            for(int i = strlen(table_object->command); i >= table_object->command_character_highlighted; i--){
+                                table_object->command[i + 1] = table_object->command[i];
+                            }
+                            table_object->command[table_object->command_character_highlighted] = c;
+                            table_object->command_character_highlighted++;
                             break;
                         }
                     }
@@ -321,8 +348,22 @@ int main(int argc, char **argv){
                     }
                     else if(c == 8){    // backspace
                         if(table_object->active_column > -1 && table_object->active_line == -1){
-                            if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > 0){
-                                table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                            // if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > 0){
+                            //     table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                            //     if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
+                            //     }
+                            //     else if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         Update_Cell_Width_By_Column(table_object, table_object->active_column);
+                            //     }
+                            //     table_object->character_highlighted--;
+                            //     break;
+                            // }
+                            if(table_object->character_highlighted > 0){
+                                // table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                                for(int i = table_object->character_highlighted - 1; i < strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]); i++){
+                                    table_object->header[table_object->columns_order_of_display[table_object->active_column]][i] = table_object->header[table_object->columns_order_of_display[table_object->active_column]][i + 1];
+                                }
                                 if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
                                     table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
                                 }
@@ -334,8 +375,22 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(table_object->active_column > -1 && table_object->active_line > -1){
+                            // if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > 0){
+                            //     table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                            //     if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+                            //     }
+                            //     else if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         Update_Cell_Width_By_Column(table_object, table_object->active_column);
+                            //     }
+                            //     table_object->character_highlighted--;
+                            //     break;
+                            // }
                             if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > 0){
-                                table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                                // table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) - 1] = '\0';
+                                for(int i = table_object->character_highlighted - 1; i < strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]); i++){
+                                    table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i] = table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i + 1];
+                                }
                                 if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
                                     table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
                                 }
@@ -353,9 +408,25 @@ int main(int argc, char **argv){
                     }
                     else{
                         if(table_object->active_column > -1 && table_object->active_line == -1){
+                            // if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) < config->cell_max_width + 1){
+                            //     table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
+                            //     table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])] = c;
+                            //     if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
+                            //     }
+                            //     else if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         Update_Cell_Width_By_Column(table_object, table_object->active_column);
+                            //     }
+                            //     table_object->character_highlighted++;
+                            //     break;
+                            // }
                             if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) < config->cell_max_width + 1){
-                                table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
-                                table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])] = c;
+                                // table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
+                                // table_object->header[table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])] = c;
+                                for(int i = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]); i >= table_object->character_highlighted; i--){
+                                    table_object->header[table_object->columns_order_of_display[table_object->active_column]][i + 1] = table_object->header[table_object->columns_order_of_display[table_object->active_column]][i];
+                                }
+                                table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted] = c;
                                 if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
                                     table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
                                 }
@@ -367,9 +438,25 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(table_object->active_column > -1 && table_object->active_line > -1){
+                            // if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < config->cell_max_width + 1){
+                            //     table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
+                            //     table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])] = c;
+                            //     if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+                            //     }
+                            //     else if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                            //         Update_Cell_Width_By_Column(table_object, table_object->active_column);
+                            //     }
+                            //     table_object->character_highlighted++;
+                            //     break;
+                            // }
                             if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < config->cell_max_width + 1){
-                                table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
-                                table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])] = c;
+                                // table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) + 1] = '\0';
+                                // table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])] = c;
+                                for(int i = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]); i >= table_object->character_highlighted; i--){
+                                    table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i + 1] = table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i];
+                                }
+                                table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted] = c;
                                 if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
                                     table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
                                 }

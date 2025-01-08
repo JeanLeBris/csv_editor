@@ -1018,7 +1018,22 @@ void S_Print_Table(table_type table_object, config_type config){
     strcat(output, "\n");
     // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
     // strcat(output, char_buffer);
-    strcat(output, table_object->command);
+    // strcat(output, table_object->command);
+    for(int i = 0; i < strlen(table_object->command); i++){
+        if(i == table_object->command_character_highlighted){
+            S_Selection_Content_Colors(config, output);
+        }
+        char_buffer[0] = table_object->command[i];
+        strcat(output, char_buffer);
+        if(i == table_object->command_character_highlighted){
+            S_Default_Colors(config, output);
+        }
+    }
+    if(table_object->command_character_highlighted == strlen(table_object->command)){
+        S_Selection_Content_Colors(config, output);
+        strcat(output, " ");
+        S_Default_Colors(config, output);
+    }
     
     if(table_object->character_highlighted != -1 && width_of_cell_changed){
         if(table_object->active_line == -1){
