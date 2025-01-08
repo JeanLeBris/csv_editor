@@ -23,7 +23,7 @@ typedef struct table_type{
     int *cell_width;
     int *columns_order_of_display;
 
-    char command[101];
+    char **command;
     int command_character_highlighted;
 
     int table_length;
@@ -36,6 +36,6 @@ void Print_Table(table_type table_object, config_type config);
 void S_Print_Table(table_type table_object, config_type config);
 void Update_Cell_Width_By_Column(table_type table_object, int displayed_column_id);
 
-table_type Free_Table_Object(table_type table_object);
+table_type Free_Table_Object(table_type table_object, config_type config);
 
 #endif

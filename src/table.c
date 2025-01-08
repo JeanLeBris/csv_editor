@@ -1019,17 +1019,17 @@ void S_Print_Table(table_type table_object, config_type config){
     // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
     // strcat(output, char_buffer);
     // strcat(output, table_object->command);
-    for(int i = 0; i < strlen(table_object->command); i++){
+    for(int i = 0; i < strlen(table_object->command[0]); i++){
         if(i == table_object->command_character_highlighted){
             S_Selection_Content_Colors(config, output);
         }
-        char_buffer[0] = table_object->command[i];
+        char_buffer[0] = table_object->command[0][i];
         strcat(output, char_buffer);
         if(i == table_object->command_character_highlighted){
             S_Default_Colors(config, output);
         }
     }
-    if(table_object->command_character_highlighted == strlen(table_object->command)){
+    if(table_object->command_character_highlighted == strlen(table_object->command[0])){
         S_Selection_Content_Colors(config, output);
         strcat(output, " ");
         S_Default_Colors(config, output);
@@ -1058,7 +1058,7 @@ void Update_Cell_Width_By_Column(table_type table_object, int displayed_column_i
     }
 }
 
-table_type Free_Table_Object(table_type table_object){
+table_type Free_Table_Object(table_type table_object, config_type config){
     for(int j = 0; j < table_object->table_length; j++){
         for(int k = 0; k < table_object->table_width; k++){
             free(table_object->table[j][k]);
@@ -1075,6 +1075,11 @@ table_type Free_Table_Object(table_type table_object){
     free(table_object->columns_order_of_display);
     
     free(table_object->cell_width);
+
+    for(int j = 0; j < config->commands_history_length; j++){
+        free(table_object->command[j]);
+    }
+    free(table_object->command);
 
     free(table_object);
 

@@ -26,11 +26,15 @@ typedef struct config_type{
     char input_separator;
     char output_separator;
 
+    int commands_history_length;
+
     char input_mode[10];
     char input_file[50];
 
     int window_width;
     int window_length;
+
+    int show_config;
 }*config_type;
 
 void Set_Default_Config(config_type config, char *exe_path);

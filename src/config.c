@@ -32,8 +32,12 @@ void Set_Default_Config(config_type config, char *exe_path){
     config->input_separator = ',';
     config->output_separator = ',';
 
+    config->commands_history_length = 100;
+
     strcpy(config->input_mode, "");
     strcpy(config->input_file, "");
+
+    config->show_config = 0;
 
     Set_Window_Size(config);
 }
@@ -146,6 +150,11 @@ void Load_Config(config_type config){
             config->output_separator = config->input_separator;
             // printf("%c\n", config->separator);
         }
+        else if(strcmp(fragmented_line, "commands_history_length") == 0){
+            // strcpy(config->commands_history_length, strtok(NULL, seps));
+            config->commands_history_length = atoi(strtok(NULL, seps));
+            // printf("%s\n", config->commands_history_length);
+        }
     }
     fclose(f);
 }
@@ -163,6 +172,9 @@ void Get_Config_From_Args(config_type config, int argc, char **argv){
                 strcpy(config->input_file, argv[i + 1]);
                 i++;
             }
+        }
+        else if(strcmp(argv[i], "--show-config") == 0){
+            config->show_config = 1;
         }
     }
 }
@@ -232,4 +244,6 @@ void Print_Config(config_type config){
     printf("Window specifications :\n");
     printf("\tWindow width : %d\n", config->window_width);
     printf("\tWindow length : %d\n", config->window_length);
+    printf("Other :\n");
+    printf("\tCommands history length : %d\n", config->commands_history_length);
 }
