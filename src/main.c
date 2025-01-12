@@ -47,6 +47,7 @@ int main(int argc, char **argv){
         }
         char *command_buffer = NULL;
         table_object->command_character_highlighted = -1;
+        table_object->active_command = 0;
 
         while(running){
             Set_Window_Size(config);
@@ -229,16 +230,25 @@ int main(int argc, char **argv){
                         if(c == 27){    // ESC
                             table_object->command[0][0] = '\0';
                             table_object->command_character_highlighted = -1;
+                            table_object->active_command = 0;
                             state = REGULAR_STATE;
                             break;
                         }
                         else if(c == -32){
                             c = getch();
                             if(c == 72){    // Up
-                                
+                                if(table_object->active_command < config->commands_history_length && strlen(table_object->command[table_object->active_command + 1]) > 0){
+                                    table_object->active_command++;
+                                    table_object->command_character_highlighted = strlen(table_object->command[table_object->active_command]);
+                                    break;
+                                }
                             }
                             else if(c == 80){   // Down
-                                
+                                if(table_object->active_command > 0){
+                                    table_object->active_command--;
+                                    table_object->command_character_highlighted = strlen(table_object->command[table_object->active_command]);
+                                    break;
+                                }
                             }
                             else if(c == 75){   // Left
                                 if(table_object->command_character_highlighted > 0){
@@ -247,13 +257,16 @@ int main(int argc, char **argv){
                                 }
                             }
                             else if(c == 77){   // Right
-                                if(table_object->command_character_highlighted < strlen(table_object->command[0])){
+                                if(table_object->command_character_highlighted < strlen(table_object->command[table_object->active_command])){
                                     table_object->command_character_highlighted++;
                                     break;
                                 }
                             }
                         }
                         else if(c == 13){   // enter
+                            if(table_object->active_command != 0){
+                                strcpy(table_object->command[0], table_object->command[table_object->active_command]);
+                            }
                             if(strcmp(table_object->command[0], ":q") == 0){
                                 running = 0;
                             }
@@ -270,8 +283,16 @@ int main(int argc, char **argv){
                                     table_object->active_line = buffer;
                                 }
                             }
+                            buffer = 0;
+                            for(int i = 0; i < config->commands_history_length && strcmp(table_object->command[i], "\0") != 0; i++){
+                                buffer = i;
+                            }
+                            for(int i = buffer + 1; i > 0; i--){
+                                strcpy(table_object->command[i], table_object->command[i - 1]);
+                            }
                             table_object->command[0][0] = '\0';
                             table_object->command_character_highlighted = -1;
+                            table_object->active_command = 0;
                             state = REGULAR_STATE;
                             break;
                         }
@@ -281,6 +302,10 @@ int main(int argc, char **argv){
                             //     table_object->command_character_highlighted--;
                             //     break;
                             // }
+                            if(table_object->active_command != 0){
+                                strcpy(table_object->command[0], table_object->command[table_object->active_command]);
+                                table_object->active_command = 0;
+                            }
                             if(table_object->command_character_highlighted > 0){
                                 for(int i = table_object->command_character_highlighted - 1; i < strlen(table_object->command[0]); i++){
                                     table_object->command[0][i] = table_object->command[0][i + 1];
@@ -289,7 +314,11 @@ int main(int argc, char **argv){
                                 break;
                             }
                         }
-                        else{
+                        else{   // other characters
+                            if(table_object->active_command != 0){
+                                strcpy(table_object->command[0], table_object->command[table_object->active_command]);
+                                table_object->active_command = 0;
+                            }
                             if(strlen(table_object->command[0]) < command_string_size - 1){
                                 // table_object->command[strlen(table_object->command) + 1] = '\0';
                                 // table_object->command[strlen(table_object->command)] = c;

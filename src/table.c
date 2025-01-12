@@ -422,6 +422,7 @@ void Print_Table(table_type table_object, config_type config){
 void S_Print_Table(table_type table_object, config_type config){
     char *output = (char*)malloc(config->window_length * config->window_width * 2 * sizeof(char));
     strcpy(output, "\0");
+    S_Hide_Cursor(output);
     // output[0] = "\0";
     int width_of_cell_changed = 0;
     int difference = 0;
@@ -1019,21 +1020,29 @@ void S_Print_Table(table_type table_object, config_type config){
     // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
     // strcat(output, char_buffer);
     // strcat(output, table_object->command);
-    for(int i = 0; i < strlen(table_object->command[0]); i++){
+    for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
         if(i == table_object->command_character_highlighted){
             S_Selection_Content_Colors(config, output);
         }
-        char_buffer[0] = table_object->command[0][i];
+        char_buffer[0] = table_object->command[table_object->active_command][i];
         strcat(output, char_buffer);
         if(i == table_object->command_character_highlighted){
             S_Default_Colors(config, output);
         }
     }
-    if(table_object->command_character_highlighted == strlen(table_object->command[0])){
+    if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
         S_Selection_Content_Colors(config, output);
         strcat(output, " ");
         S_Default_Colors(config, output);
+        // for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < config->window_width; i++){
+        //     strcat(output, " ");
+        // }
     }
+    // else{
+    //     for(int i = strlen(table_object->command[table_object->active_command]); i < config->window_width; i++){
+    //         strcat(output, " ");
+    //     }
+    // }
     
     if(table_object->character_highlighted != -1 && width_of_cell_changed){
         if(table_object->active_line == -1){
@@ -1076,7 +1085,7 @@ table_type Free_Table_Object(table_type table_object, config_type config){
     
     free(table_object->cell_width);
 
-    for(int j = 0; j < config->commands_history_length; j++){
+    for(int j = 0; j < config->commands_history_length + 1; j++){
         free(table_object->command[j]);
     }
     free(table_object->command);

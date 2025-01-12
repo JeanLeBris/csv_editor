@@ -51,6 +51,14 @@ void S_Selection_Content_Colors(config_type config, char *string){
     strcat(string, buffer);
 }
 
+void S_Hide_Cursor(char *string){
+    strcat(string, "\e[?25l");
+}
+
+void S_Show_Cursor(char *string){
+    strcat(string, "\e[?25h");
+}
+
 void Clear_Screen(){
     // printf("\e[1;1H\e[2J");
     system("cls");

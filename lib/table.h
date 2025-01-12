@@ -25,6 +25,7 @@ typedef struct table_type{
 
     char **command;
     int command_character_highlighted;
+    int active_command;
 
     int table_length;
     int table_width;

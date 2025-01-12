@@ -16,6 +16,9 @@ void S_Odd_Line_Colors(config_type config, char *string);
 void S_Even_Line_Colors(config_type config, char *string);
 void S_Selection_Content_Colors(config_type config, char *string);
 
+void S_Hide_Cursor(char *string);
+void S_Show_Cursor(char *string);
+
 void Clear_Screen();
 
 #endif
