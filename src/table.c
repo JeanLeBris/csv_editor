@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <windows.h>
 #include "../lib/table.h"
 
 void Get_File_Characteristics(table_type table_object, config_type config){
@@ -150,14 +151,14 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     // for(int i = 0; i < table_object->table_width; i++){
     //     printf("%d\n", table_object->columns_order_of_display[i]);
     // }
-    printf("%d\t%d", table_object->table_length, table_object->table_width);
+    // printf("%d\t%d", table_object->table_length, table_object->table_width);
     free(line);
     fclose(f);
 }
 
 void Print_Table(table_type table_object, config_type config){
     int difference = 0;
-    Clear_Screen();
+    Clear_Screen_By_Scrolldown();
 
     // Header part
 
@@ -428,7 +429,7 @@ void S_Print_Table(table_type table_object, config_type config){
     int difference = 0;
     char char_buffer[10] = " ";
     int width_counter = 0;
-    // Clear_Screen();
+    // Clear_Screen_By_Scrolldown();
     int amount_of_rows_reserved_for_content_other_than_rows = 5;    // the header is not considered a row
     int max_lines_to_print = config->window_length - amount_of_rows_reserved_for_content_other_than_rows;
     int sum = 0;
@@ -585,6 +586,10 @@ void S_Print_Table(table_type table_object, config_type config){
             strcat(output, "+");
             width_counter++;
         }
+    }
+    while(width_counter < config->window_width){
+        strcat(output, " ");
+        width_counter++;
     }
     strcat(output, "\n");
     width_counter = 0;
@@ -744,6 +749,10 @@ void S_Print_Table(table_type table_object, config_type config){
     if(table_object->active_line == -1 && table_object->active_column == -1){
         S_Default_Colors(config, output);
     }
+    while(width_counter < config->window_width){
+        strcat(output, " ");
+        width_counter++;
+    }
     strcat(output, "\n");
     width_counter = 0;
     if(table_object->table_width > 0){
@@ -788,6 +797,10 @@ void S_Print_Table(table_type table_object, config_type config){
             strcat(output, "+");
             width_counter++;
         }
+    }
+    while(width_counter < config->window_width){
+        strcat(output, " ");
+        width_counter++;
     }
     strcat(output, "\n");
 
@@ -961,8 +974,13 @@ void S_Print_Table(table_type table_object, config_type config){
                 width_counter++;
             }
         }
-        if(i == table_object->active_line && table_object->active_column == -1){
-            S_Default_Colors(config, output);
+        // if(i == table_object->active_line && table_object->active_column == -1){
+        //     S_Default_Colors(config, output);
+        // }
+        S_Default_Colors(config, output);
+        while(width_counter < config->window_width){
+            strcat(output, " ");
+            width_counter++;
         }
         strcat(output, "\n");
     }
@@ -1013,6 +1031,10 @@ void S_Print_Table(table_type table_object, config_type config){
             width_counter++;
         }
     }
+    while(width_counter < config->window_width){
+        strcat(output, " ");
+        width_counter++;
+    }
     for(int i= table_object->table_length; i < max_lines_to_print; i++){
         strcat(output, "\n");
     }
@@ -1034,15 +1056,15 @@ void S_Print_Table(table_type table_object, config_type config){
         S_Selection_Content_Colors(config, output);
         strcat(output, " ");
         S_Default_Colors(config, output);
-        // for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < config->window_width; i++){
-        //     strcat(output, " ");
-        // }
+        for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < config->window_width; i++){
+            strcat(output, " ");
+        }
     }
-    // else{
-    //     for(int i = strlen(table_object->command[table_object->active_command]); i < config->window_width; i++){
-    //         strcat(output, " ");
-    //     }
-    // }
+    else{
+        for(int i = strlen(table_object->command[table_object->active_command]); i < config->window_width; i++){
+            strcat(output, " ");
+        }
+    }
     
     if(table_object->character_highlighted != -1 && width_of_cell_changed){
         if(table_object->active_line == -1){
@@ -1053,7 +1075,8 @@ void S_Print_Table(table_type table_object, config_type config){
         }
     }
     
-    Clear_Screen();
+    Scrollback_To_Screen_Start();
+
     printf("%s", output);
     free(output);
 }

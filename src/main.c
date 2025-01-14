@@ -49,9 +49,11 @@ int main(int argc, char **argv){
         table_object->command_character_highlighted = -1;
         table_object->active_command = 0;
 
+        Clear_Screen_By_Scrolldown();
+
         while(running){
             Set_Window_Size(config);
-            // Clear_Screen();
+            // Clear_Screen_By_Scrolldown();
             // Print_Config(config);
             S_Print_Table(table_object, config);
             // _sleep(100);
@@ -518,10 +520,12 @@ int main(int argc, char **argv){
                 }
             }
         }
+        
         table_object = Free_Table_Object(table_object, config);
         free(config);   // Push to right place, useless here
         free(string_buffer);
-        Clear_Screen();
+
+        Clear_Screen_By_Cleaning();
     }
     return 0;
 }

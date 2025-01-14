@@ -19,6 +19,8 @@ void S_Selection_Content_Colors(config_type config, char *string);
 void S_Hide_Cursor(char *string);
 void S_Show_Cursor(char *string);
 
-void Clear_Screen();
+void Clear_Screen_By_Scrolldown();
+void Clear_Screen_By_Cleaning();
+void Scrollback_To_Screen_Start();
 
 #endif
