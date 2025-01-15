@@ -50,6 +50,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     int col_num = 0;
     int line_num = 0;
     int in_cell_iterator = 0;
+    int in_quotes = 0;
     char *line = malloc((config->file_line_max_length + 1) * sizeof(*line));
     int i = 0;
     // printf("%d,%d\n", table_object->table_length, table_object->table_width);
@@ -57,10 +58,11 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
         line = fgets(line, config->file_line_max_length + 1, f);
         if(line != NULL){
             // printf(line);
-            if(i == 0){
+            if(i == 0){ // if in header
                 table_object->header = malloc(table_object->table_width * sizeof(*table_object->header));
                 for(int j = 0; j < table_object->table_width; j++){
                     table_object->header[j] = malloc((config->cell_max_width + 1) * sizeof(char));
+                    table_object->header[j][0] = '\0';
                 }
                 table_object->columns_order_of_display = malloc(table_object->table_width * sizeof(int));
                 for(int j = 0; j < table_object->table_width; j++){
@@ -72,27 +74,65 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 }
                 col_num = 0;
                 for(int j = 0; j < strlen(line); j++){
-                    if(line[j] == config->input_separator){
+                    if(in_quotes != 1 && line[j] == config->input_separator){
                         table_object->header[col_num][in_cell_iterator] = '\0';
                         table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
                         // printf("%s\n", table_object->header[col_num]);
                         col_num++;
                         in_cell_iterator = 0;
+                        in_quotes = 0;
                     }
-                    else if((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0'){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
+                    else if(in_quotes != 1 && ((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0')){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
                         table_object->header[col_num][in_cell_iterator] = '\0';
                         table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
                         // printf("%s\n", table_object->header[col_num]);
+                        in_quotes = 0;
                     }
-                    else{
+                    else if(in_quotes == 0 && line[j] == '\"'){
+                        in_quotes++;
+                    }
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){
+                        in_quotes++;
+                    }
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){
                         if(in_cell_iterator < config->cell_max_width){
                             table_object->header[col_num][in_cell_iterator] = line[j];
                             in_cell_iterator++;
                         }
+                        j++;
+                    }
+                    else{
+                        if(in_cell_iterator < config->cell_max_width){
+                            if(line[j] == '\n'){
+                                // table_object->header[col_num][in_cell_iterator] = '\n';
+                                table_object->header[col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
+                                in_quotes = 0;
+                            }
+                            else if(line[j] == '\r' && line[j + 1] == '\n'){
+                                // table_object->header[col_num][in_cell_iterator] = '\n';
+                                // j++;
+                                table_object->header[col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
+                                in_quotes = 0;
+                            }
+                            else if(line[j] == '\0'){
+                                table_object->header[col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->header[col_num]);
+                                in_quotes = 0;
+                            }
+                            else{
+                                table_object->header[col_num][in_cell_iterator] = line[j];
+                            }
+                            in_cell_iterator++;
+                        }
+                        else{
+                            table_object->header[col_num][config->cell_max_width - 1] = '\0';
+                        }
                     }
                 }
             }
-            else{
+            else{   // if in body
                 if(i == 1){
                     // Unclean way of declaring the table, to change
                     table_object->table = malloc(table_object->table_length * sizeof(char **));
@@ -100,6 +140,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                         table_object->table[j] = malloc(table_object->table_width * sizeof(char *));
                         for(int k = 0; k < table_object->table_width; k++){
                             table_object->table[j][k] = malloc((config->cell_max_width + 1) * sizeof(char));
+                            table_object->table[j][k][0] = '\0';
                         }
                     }
 
@@ -111,24 +152,62 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 col_num = 0;
                 in_cell_iterator = 0;
                 for(int j = 0; j < strlen(line) + 1; j++){  // +1 to be sure of getting a '\0' character
-                    if(line[j] == config->input_separator){
+                    if(in_quotes != 1 && line[j] == config->input_separator){
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
                         // printf("%s\n", table_object->table[line_num][col_num]);
                         col_num++;
                         in_cell_iterator = 0;
+                        in_quotes = 0;
                     }
-                    else if((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0'){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
+                    else if(in_quotes != 1 && ((line[j] == '\r' && line[j + 1] == '\n') || line[j] == '\n' || line[j] == '\0')){ // End of line either by CRLF or LF (\0 added to it in case there is no next line)
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
                         // printf("%s\n", table_object->table[line_num][col_num]);
+                        in_quotes = 0;
                     }
-                    else{
+                    else if(in_quotes == 0 && line[j] == '\"'){
+                        in_quotes++;
+                    }
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){
+                        in_quotes++;
+                    }
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){
                         if(in_cell_iterator < config->cell_max_width){
                             table_object->table[line_num][col_num][in_cell_iterator] = line[j];
                             in_cell_iterator++;
+                        }
+                        j++;
+                    }
+                    else{
+                        if(in_cell_iterator < config->cell_max_width){
+                            if(line[j] == '\n'){
+                                // table_object->table[line_num][col_num][in_cell_iterator] = '\n';
+                                table_object->table[line_num][col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
+                                in_quotes = 0;
+                            }
+                            else if(line[j] == '\r' && line[j + 1] == '\n'){
+                                // table_object->table[line_num][col_num][in_cell_iterator] = '\n';
+                                // j++;
+                                table_object->table[line_num][col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
+                                in_quotes = 0;
+                            }
+                            else if(line[j] == '\0'){
+                                table_object->table[line_num][col_num][in_cell_iterator] = '\0';
+                                table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
+                                in_quotes = 0;
+                            }
+                            else{
+                                table_object->table[line_num][col_num][in_cell_iterator] = line[j];
+                            }
+                            in_cell_iterator++;
+                        }
+                        else{
+                            table_object->table[line_num][col_num][config->cell_max_width - 1] = '\0';
                         }
                     }
                 }
@@ -1035,8 +1114,11 @@ void S_Print_Table(table_type table_object, config_type config){
         strcat(output, " ");
         width_counter++;
     }
-    for(int i= table_object->table_length; i < max_lines_to_print; i++){
+    for(int i = table_object->table_length; i < max_lines_to_print; i++){
         strcat(output, "\n");
+        for(int j = 0; j < config->window_width; j++){
+            strcat(output, " ");
+        }
     }
     strcat(output, "\n");
     // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
