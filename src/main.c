@@ -1,11 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <libloaderapi.h>
 // #include <sys/ioctl.h>
 // #include <winioctl.h>
+#ifdef _WIN64
+#include <libloaderapi.h>
 #include <windows.h>
 #include <conio.h>
+#endif
 #include "../lib/config.h"
 #include "../lib/colors.h"
 #include "../lib/table.h"

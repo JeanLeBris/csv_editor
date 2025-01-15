@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef  _WIN64
 #include <windows.h>
+#endif
 #include "../lib/colors.h"
 
 void Default_Colors(config_type config){

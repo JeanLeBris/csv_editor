@@ -2,7 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#ifdef _WIN64
 #include <windows.h>
+#endif
 #include "../lib/table.h"
 
 void Get_File_Characteristics(table_type table_object, config_type config){

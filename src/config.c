@@ -1,8 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef _WIN64
 #include <libloaderapi.h>
 #include <windows.h>
+#endif
 #include "../lib/config.h"
 
 void Set_Default_Config(config_type config, char *exe_path){
