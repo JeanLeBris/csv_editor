@@ -1,11 +1,58 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __linux__
+#include <ncurses.h>
+#endif
 #ifdef  _WIN64
 #include <windows.h>
 #endif
 #include "../lib/colors.h"
 
+#ifdef __linux__
+void Default_Colors(config_type config){
+    attron(COLOR_PAIR(1));
+}
+
+void Reset_Colors(config_type config){
+    Default_Colors(config);
+}
+
+void Odd_Line_Colors(config_type config){
+    attron(COLOR_PAIR(3));
+}
+
+void Even_Line_Colors(config_type config){
+    attron(COLOR_PAIR(4));
+}
+
+void Selection_Content_Colors(config_type config){
+    attron(COLOR_PAIR(5));
+}
+
+void Hide_Cursor(){
+    curs_set(0);
+}
+
+void Show_Cursor(){
+    curs_set(1);
+}
+
+void Clear_Screen_By_Scrolldown(){
+    system("clear");
+}
+
+void Clear_Screen_By_Cleaning(){
+    system("clear");
+}
+
+void Scrollback_To_Screen_Start(){
+    //system("clear");
+    clear();
+}
+#endif
+
+#ifdef _WIN64
 void Default_Colors(config_type config){
     printf("\e[%d;%dm", config->default_background_color, config->default_text_color);
 }
@@ -124,3 +171,4 @@ void Scrollback_To_Screen_Start(){
 
     SetConsoleCursorPosition(hStdout, csbi.dwCursorPosition);
 }
+#endif

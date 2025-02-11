@@ -53,3 +53,5 @@ dkms.conf
 
 # Unrelated files
 *.csv
+.vscode
+.swp

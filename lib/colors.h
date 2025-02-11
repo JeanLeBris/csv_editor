@@ -16,8 +16,14 @@ void S_Odd_Line_Colors(config_type config, char *string);
 void S_Even_Line_Colors(config_type config, char *string);
 void S_Selection_Content_Colors(config_type config, char *string);
 
-void S_Hide_Cursor(char *string);
-void S_Show_Cursor(char *string);
+#ifdef __linux__
+void Hide_Cursor();
+void Show_Cursor();
+#endif
+#ifdef _WIN64
+void Hide_Cursor(char *string);
+void Show_Cursor(char *string);
+#endif
 
 void Clear_Screen_By_Scrolldown();
 void Clear_Screen_By_Cleaning();

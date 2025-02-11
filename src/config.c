@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#ifdef __linux__
+#include <sys/ioctl.h>
+#include <unistd.h>
+#include <ncurses.h>
+#endif
 #ifdef _WIN64
 #include <libloaderapi.h>
 #include <windows.h>
@@ -11,8 +16,15 @@ void Set_Default_Config(config_type config, char *exe_path){
     // char memstr[101] = "";
     // int memstr_size = GetModuleFileNameA(NULL, memstr, 100);
     // strncpy(config->installation_directory, memstr, memstr_size - 14);
+    #ifdef __linux__
+    getcwd(config->installation_directory, 100);    // only works if in the program's directory
+    config->installation_directory[strlen(config->installation_directory) + 1] = '\0';
+    config->installation_directory[strlen(config->installation_directory)] = '/';
+    #endif
+    #ifdef _WIN64
     strncpy(config->installation_directory, exe_path, strlen(exe_path) - 14);
     config->installation_directory[strlen(exe_path) - 14] = '\0';
+    #endif
 
     config->default_background_color = 40;
     config->default_text_color = 37;
@@ -24,6 +36,14 @@ void Set_Default_Config(config_type config, char *exe_path){
     config->even_text_line_color = 37;
     config->selection_background_color = 47;
     config->selection_text_color = 30;
+
+    #ifdef __linux__
+    init_pair(1, config->default_text_color%10, config->default_background_color%10);
+    init_pair(2, config->text_header_color%10, config->background_header_color%10);
+    init_pair(3, config->odd_text_line_color%10, config->odd_background_line_color%10);
+    init_pair(4, config->even_text_line_color%10, config->even_background_line_color%10);
+    init_pair(5, config->selection_text_color%10, config->selection_background_color%10);
+    #endif
 
     config->table_type = 0; // static
     config->file_line_max_length = 1000;
@@ -158,6 +178,15 @@ void Load_Config(config_type config){
             // printf("%s\n", config->commands_history_length);
         }
     }
+
+    #ifdef __linux__
+    init_pair(1, config->default_text_color%10, config->default_background_color%10);
+    init_pair(2, config->text_header_color%10, config->background_header_color%10);
+    init_pair(3, config->odd_text_line_color%10, config->odd_background_line_color%10);
+    init_pair(4, config->even_text_line_color%10, config->even_background_line_color%10);
+    init_pair(5, config->selection_text_color%10, config->selection_background_color%10);
+    #endif
+
     fclose(f);
 }
 
@@ -181,6 +210,23 @@ void Get_Config_From_Args(config_type config, int argc, char **argv){
     }
 }
 
+#ifdef __linux__
+void Get_Window_Size(int *columns, int *rows){
+    /* CONSOLE_SCREEN_BUFFER_INFO csbi;
+
+    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
+    *columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
+    *rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1; */
+
+    struct winsize w;
+    ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+
+    *rows = w.ws_row;
+    *columns = w.ws_col;
+}
+#endif
+
+#ifdef _WIN64
 void Get_Window_Size(int *columns, int *rows){
     CONSOLE_SCREEN_BUFFER_INFO csbi;
 
@@ -188,6 +234,7 @@ void Get_Window_Size(int *columns, int *rows){
     *columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
     *rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1;
 }
+#endif
 
 void Set_Window_Size(config_type config){
     int columns, rows;
@@ -210,6 +257,51 @@ void Set_Max_Table_Length(config_type config){
         config->max_table_length = -1;
 }
 
+#ifdef __linux__
+void Print_Config(config_type config){
+    printw("Configuration :\n");
+    printw("General :\n");
+    printw("\tInstallation directory : %s\n", config->installation_directory);
+    printw("Colors :\n");
+    printw("\tDefault background color : %d\n", config->default_background_color);
+    printw("\tDefault text color : %d\n", config->default_text_color);
+    printw("\tBackground header color : %d\n", config->background_header_color);
+    printw("\tText header color : %d\n", config->text_header_color);
+    printw("\tOdd background line color : %d\n", config->odd_background_line_color);
+    printw("\tOdd text line color : %d\n", config->odd_text_line_color);
+    printw("\tEven background line color : %d\n", config->even_background_line_color);
+    printw("\tEven text line color : %d\n", config->even_text_line_color);
+    printw("\tSelection background color : %d\n", config->selection_background_color);
+    printw("\tSelection text color : %d\n", config->selection_text_color);
+    printw("Table :\n");
+    if(config->table_type == 0)
+        printw("\tTable type : static\n");
+    else if(config->table_type == 1)
+        printw("\tTable type : dynamic\n");
+    else
+        printw("\tTable type : UNRECOGNIZED\n");
+    printw("\tFile line max length : %d\n", config->file_line_max_length);
+    printw("\tFile max length : %d\n", config->file_max_length);
+    printw("\tUnfocused cell max width : %d\n", config->unfocused_cell_max_width);
+    printw("\tFocused cell max width : %d\n", config->focused_cell_max_width);
+    printw("\tCell max width : %d\n", config->cell_max_width);
+    printw("\tTable length : %d\n", config->max_table_length);
+    printw("Session config :\n");
+    printw("\tInput mode : %s\n", config->input_mode);
+    printw("\tInput file : %s\n", config->input_file);
+    printw("\tInput separator : %c\n", config->input_separator);
+    printw("\tOutput separator : %c\n", config->output_separator);
+    printw("Window specifications :\n");
+    printw("\tWindow width : %d\n", config->window_width);
+    printw("\tWindow length : %d\n", config->window_length);
+    printw("Other :\n");
+    printw("\tCommands history length : %d\n", config->commands_history_length);
+    refresh();
+    getch();
+}
+#endif
+
+#ifdef _WIN64
 void Print_Config(config_type config){
     printf("Configuration :\n");
     printf("General :\n");
@@ -249,3 +341,4 @@ void Print_Config(config_type config){
     printf("Other :\n");
     printf("\tCommands history length : %d\n", config->commands_history_length);
 }
+#endif
