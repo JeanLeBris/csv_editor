@@ -1028,6 +1028,8 @@ int main(int argc, char **argv){
 
         Clear_Screen_By_Cleaning();
     }
+    #ifdef __linux__
     endwin();
+    #endif
     return 0;
 }

@@ -21,8 +21,8 @@ void Hide_Cursor();
 void Show_Cursor();
 #endif
 #ifdef _WIN64
-void Hide_Cursor(char *string);
-void Show_Cursor(char *string);
+void S_Hide_Cursor(char *string);
+void S_Show_Cursor(char *string);
 #endif
 
 void Clear_Screen_By_Scrolldown();
