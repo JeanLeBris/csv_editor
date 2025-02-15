@@ -38,11 +38,11 @@ void Set_Default_Config(config_type config, char *exe_path){
     config->selection_text_color = 30;
 
     #ifdef __linux__
-    init_pair(1, config->default_text_color%10, config->default_background_color%10);
-    init_pair(2, config->text_header_color%10, config->background_header_color%10);
-    init_pair(3, config->odd_text_line_color%10, config->odd_background_line_color%10);
-    init_pair(4, config->even_text_line_color%10, config->even_background_line_color%10);
-    init_pair(5, config->selection_text_color%10, config->selection_background_color%10);
+    init_pair(1, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, config->default_background_color / 10 < 5 ? config->default_background_color%10 : 8 + config->default_background_color%10);
+    init_pair(2, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
+    init_pair(3, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
+    init_pair(4, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
+    init_pair(5, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
     #endif
 
     config->table_type = 0; // static
@@ -180,11 +180,11 @@ void Load_Config(config_type config){
     }
 
     #ifdef __linux__
-    init_pair(1, config->default_text_color%10, config->default_background_color%10);
-    init_pair(2, config->text_header_color%10, config->background_header_color%10);
-    init_pair(3, config->odd_text_line_color%10, config->odd_background_line_color%10);
-    init_pair(4, config->even_text_line_color%10, config->even_background_line_color%10);
-    init_pair(5, config->selection_text_color%10, config->selection_background_color%10);
+    init_pair(1, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, config->default_background_color / 10 < 5 ? config->default_background_color%10 : 8 + config->default_background_color%10);
+    init_pair(2, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
+    init_pair(3, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
+    init_pair(4, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
+    init_pair(5, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
     #endif
 
     fclose(f);
@@ -212,12 +212,6 @@ void Get_Config_From_Args(config_type config, int argc, char **argv){
 
 #ifdef __linux__
 void Get_Window_Size(int *columns, int *rows){
-    /* CONSOLE_SCREEN_BUFFER_INFO csbi;
-
-    GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &csbi);
-    *columns = csbi.srWindow.Right - csbi.srWindow.Left + 1;
-    *rows = csbi.srWindow.Bottom - csbi.srWindow.Top + 1; */
-
     struct winsize w;
     ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
@@ -297,7 +291,9 @@ void Print_Config(config_type config){
     printw("Other :\n");
     printw("\tCommands history length : %d\n", config->commands_history_length);
     refresh();
+    nodelay(stdscr, FALSE);
     getch();
+    nodelay(stdscr, TRUE);
 }
 #endif
 
