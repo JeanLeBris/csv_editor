@@ -4,6 +4,7 @@
 
 #include "./config.h"
 
+void display(const char *string, ...);
 void Default_Colors(config_type config);
 void Reset_Colors(config_type config);
 void Odd_Line_Colors(config_type config);

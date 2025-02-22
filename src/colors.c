@@ -10,6 +10,10 @@
 #include "../lib/colors.h"
 
 #ifdef __linux__
+void display(const char *string, ...){
+    printw(string);
+}
+
 void Default_Colors(config_type config){
     attron(COLOR_PAIR(1));
 }
