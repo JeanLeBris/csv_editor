@@ -242,8 +242,9 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
 
 #ifdef __linux__
 void Print_Table(table_type table_object, config_type config){
+    char *output = NULL;
     Scrollback_To_Screen_Start();
-    Hide_Cursor();
+    Hide_Cursor(output);
     int width_of_cell_changed = 0;
     int difference = 0;
     char char_buffer[10] = " ";
@@ -364,67 +365,67 @@ void Print_Table(table_type table_object, config_type config){
     // Header part
 
     if(table_object->table_width > 0){
-        Default_Colors(config);
-        display("+");
+        Default_Colors(config, output);
+        display("+", output);
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
         if(i == table_object->active_column){
             if(table_object->active_line == -2){
-                Selection_Content_Colors(config);
+                Selection_Content_Colors(config, output);
             }
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->focused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->unfocused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
         }
         if(width_counter < config->window_width){
-            display("+");
+            display("+", output);
             width_counter++;
         }
     }
     while(width_counter < config->window_width){
-        display(" ");
+        display(" ", output);
         width_counter++;
     }
     width_counter = 0;
     if(table_object->table_width > 0){
         if(table_object->active_line == -1 && table_object->active_column == -1){                // To fix
-            Selection_Content_Colors(config);
+            Selection_Content_Colors(config, output);
         }
         else{
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
-        display("|");
+        display("|", output);
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
         if(i == table_object->active_column){   // if header is in active column
             if(table_object->character_highlighted == -1 && (table_object->active_line == -1 || table_object->active_line == -2)){
-                Selection_Content_Colors(config);
+                Selection_Content_Colors(config, output);
             }
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){   // if cell width of header fits in displayed cell
                 if(table_object->active_line != -1 || (table_object->character_highlighted < (int)strlen(table_object->header[table_object->columns_order_of_display[i]]))){ // strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])
@@ -436,25 +437,25 @@ void Print_Table(table_type table_object, config_type config){
                 // sprintf(char_buffer, "%d", (int)strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]));
                 // strcat(output, char_buffer);
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
-                    display(" ");
+                    display(" ", output);
                     width_counter++;
                 }
                 // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                     char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
                     if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                        Selection_Content_Colors(config);
+                        Selection_Content_Colors(config, output);
                     }
-                    display(char_buffer);
+                    display(char_buffer, output);
                     if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                        Default_Colors(config);
+                        Default_Colors(config, output);
                     }
                     width_counter++;
                 }
                 if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
-                    Selection_Content_Colors(config);
-                    display(" ");
-                    Default_Colors(config);
+                    Selection_Content_Colors(config, output);
+                    display(" ", output);
+                    Default_Colors(config, output);
                     width_counter++;
                 }
             }
@@ -466,7 +467,7 @@ void Print_Table(table_type table_object, config_type config){
                     difference = config->focused_cell_max_width - strlen(table_object->header[table_object->columns_order_of_display[i]]) - 1;
                 }
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
-                    display(" ");
+                    display(" ", output);
                     width_counter++;
                 }
                 if(difference < 0){ // if header width doesn't fit in displayed cell
@@ -475,11 +476,11 @@ void Print_Table(table_type table_object, config_type config){
                         for(int j = table_object->first_character_printed; j < table_object->first_character_printed + config->focused_cell_max_width && width_counter < config->window_width; j++){
                             char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
                             if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                                Selection_Content_Colors(config);
+                                Selection_Content_Colors(config, output);
                             }
-                            display(char_buffer);
+                            display(char_buffer, output);
                             if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                                Default_Colors(config);
+                                Default_Colors(config, output);
                             }
                             // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
                             width_counter++;
@@ -491,7 +492,7 @@ void Print_Table(table_type table_object, config_type config){
                             // if(j == table_object->character_highlighted){
                             //     S_Selection_Content_Colors(config, output);
                             // }
-                            display(char_buffer);
+                            display(char_buffer, output);
                             // if(j == table_object->character_highlighted){
                             //     S_Default_Colors(config, output);
                             // }
@@ -505,48 +506,48 @@ void Print_Table(table_type table_object, config_type config){
                     for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                         char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
                         if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                            Selection_Content_Colors(config);
+                            Selection_Content_Colors(config, output);
                         }
-                        display(char_buffer);
+                        display(char_buffer, output);
                         if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                            Default_Colors(config);
+                            Default_Colors(config, output);
                         }
                         width_counter++;
                     }
                 }
                 if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
-                    Selection_Content_Colors(config);
-                    display(" ");
-                    Default_Colors(config);
+                    Selection_Content_Colors(config, output);
+                    display(" ", output);
+                    Default_Colors(config, output);
                     width_counter++;
                 }
             }
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
         else{   // if header not in active column
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
                 difference = table_object->cell_width[table_object->columns_order_of_display[i]] - strlen(table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
-                    display(" ");
+                    display(" ", output);
                     width_counter++;
                 }
                 // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                     char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
-                    display(char_buffer);
+                    display(char_buffer, output);
                     width_counter++;
                 }
             }
             else{
                 difference = config->unfocused_cell_max_width - strlen(table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < difference && width_counter < config->window_width; j++){
-                    display(" ");
+                    display(" ", output);
                     width_counter++;
                 }
                 if(difference < 0){
                     for(int j = 0; j < config->unfocused_cell_max_width && width_counter < config->window_width; j++){
                         char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
-                        display(char_buffer);
+                        display(char_buffer, output);
                         // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
                         width_counter++;
                     }
@@ -555,70 +556,70 @@ void Print_Table(table_type table_object, config_type config){
                     // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                     for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                         char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
-                        display(char_buffer);
+                        display(char_buffer, output);
                         width_counter++;
                     }
                 }
             }
         }
         if(width_counter < config->window_width){
-            display("|");
+            display("|", output);
             width_counter++;
         }
     }
     if(table_object->active_line == -1 && table_object->active_column == -1){
-        Default_Colors(config);
+        Default_Colors(config, output);
     }
     while(width_counter < config->window_width){
-        display(" ");
+        display(" ", output);
         width_counter++;
     }
     width_counter = 0;
     if(table_object->table_width > 0){
-        Default_Colors(config);
-        display("+");
+        Default_Colors(config, output);
+        display("+", output);
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
         if(i == table_object->active_column){
             if(table_object->active_line == -2){
-                Selection_Content_Colors(config);
+                Selection_Content_Colors(config, output);
             }
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->focused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->unfocused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
         }
         if(width_counter < config->window_width){
-            display("+");
+            display("+", output);
             width_counter++;
         }
     }
     while(width_counter < config->window_width){
-        display(" ");
+        display(" ", output);
         width_counter++;
     }
 
@@ -627,20 +628,20 @@ void Print_Table(table_type table_object, config_type config){
     for(int i = table_object->first_line_printed; i < table_object->table_length && (i - table_object->first_line_printed) < max_lines_to_print; i++){
         width_counter = 0;
         if((i + 1)%2 == 0){
-            Even_Line_Colors(config);
+            Even_Line_Colors(config, output);
         }
         else{
-            Odd_Line_Colors(config);
+            Odd_Line_Colors(config, output);
         }
         if(i == table_object->active_line && table_object->active_column == -1){
-            Selection_Content_Colors(config);
+            Selection_Content_Colors(config, output);
         }
-        display("|");
+        display("|", output);
         width_counter++;
         for(int j = table_object->first_column_printed; j < table_object->table_width; j++){
             if(j == table_object->active_column){   // if cell in active column
                 if(table_object->character_highlighted == -1 && (table_object->active_line == i || table_object->active_line == -2)){
-                    Selection_Content_Colors(config);
+                    Selection_Content_Colors(config, output);
                 }
                 if(table_object->cell_width[table_object->columns_order_of_display[j]] < config->focused_cell_max_width){   // if cell width of cell fits in displayed cell
                     if(i != table_object->active_line || (table_object->character_highlighted < (int)strlen(table_object->table[i][table_object->columns_order_of_display[j]]))){
@@ -650,30 +651,30 @@ void Print_Table(table_type table_object, config_type config){
                         difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]) - 1;
                     }
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
-                        display(" ");
+                        display(" ", output);
                         width_counter++;
                     }
                     // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                         char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
                         if(table_object->active_line == i && k == table_object->character_highlighted){
-                            Selection_Content_Colors(config);
+                            Selection_Content_Colors(config, output);
                         }
-                        display(char_buffer);
+                        display(char_buffer, output);
                         if(table_object->active_line == i && k == table_object->character_highlighted){
                             if((i + 1)%2 == 0){
-                                Even_Line_Colors(config);
+                                Even_Line_Colors(config, output);
                             }
                             else{
-                                Odd_Line_Colors(config);
+                                Odd_Line_Colors(config, output);
                             }
                         }
                         width_counter++;
                     }
                     if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
-                        Selection_Content_Colors(config);
-                        display(" ");
-                        Default_Colors(config);
+                        Selection_Content_Colors(config, output);
+                        display(" ", output);
+                        Default_Colors(config, output);
                         width_counter++;
                     }
                 }
@@ -685,7 +686,7 @@ void Print_Table(table_type table_object, config_type config){
                         difference = config->focused_cell_max_width - strlen(table_object->table[i][table_object->columns_order_of_display[j]]) - 1;
                     }
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
-                        display(" ");
+                        display(" ", output);
                         width_counter++;
                     }
                     if(difference < 0){ // if cell width doesn't fit in displayed cell
@@ -693,15 +694,15 @@ void Print_Table(table_type table_object, config_type config){
                             for(int k = table_object->first_character_printed; k < table_object->first_character_printed + config->focused_cell_max_width && width_counter < config->window_width; k++){
                                 char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
                                 if(table_object->active_line == i && k == table_object->character_highlighted){
-                                    Selection_Content_Colors(config);
+                                    Selection_Content_Colors(config, output);
                                 }
-                                display(char_buffer);
+                                display(char_buffer, output);
                                 if(table_object->active_line == i && k == table_object->character_highlighted){
                                     if((i + 1)%2 == 0){
-                                        Even_Line_Colors(config);
+                                        Even_Line_Colors(config, output);
                                     }
                                     else{
-                                        Odd_Line_Colors(config);
+                                        Odd_Line_Colors(config, output);
                                     }
                                 }
                                 // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
@@ -711,7 +712,7 @@ void Print_Table(table_type table_object, config_type config){
                         else{
                             for(int k = 0; k < config->focused_cell_max_width && width_counter < config->window_width; k++){
                                 char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
-                                display(char_buffer);
+                                display(char_buffer, output);
                                 // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
                                 width_counter++;
                             }
@@ -722,59 +723,59 @@ void Print_Table(table_type table_object, config_type config){
                         for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                             char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
                             if(table_object->active_line == i && k == table_object->character_highlighted){
-                                Selection_Content_Colors(config);
+                                Selection_Content_Colors(config, output);
                             }
-                            display(char_buffer);
+                            display(char_buffer, output);
                             if(table_object->active_line == i && k == table_object->character_highlighted){
                                 if((i + 1)%2 == 0){
-                                    Even_Line_Colors(config);
+                                    Even_Line_Colors(config, output);
                                 }
                                 else{
-                                    Odd_Line_Colors(config);
+                                    Odd_Line_Colors(config, output);
                                 }
                             }
                             width_counter++;
                         }
                     }
                     if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
-                        Selection_Content_Colors(config);
-                        display(" ");
-                        Default_Colors(config);
+                        Selection_Content_Colors(config, output);
+                        display(" ", output);
+                        Default_Colors(config, output);
                         width_counter++;
                     }
                 }
                 // Default_Colors(config);
                 if((i + 1)%2 == 0){
-                    Even_Line_Colors(config);
+                    Even_Line_Colors(config, output);
                 }
                 else{
-                    Odd_Line_Colors(config);
+                    Odd_Line_Colors(config, output);
                 }
             }
             else{   // if cell not in active column
                 if(table_object->cell_width[table_object->columns_order_of_display[j]] < config->unfocused_cell_max_width){
                     difference = table_object->cell_width[table_object->columns_order_of_display[j]] - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
-                        display(" ");
+                        display(" ", output);
                         width_counter++;
                     }
                     // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                         char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
-                        display(char_buffer);
+                        display(char_buffer, output);
                         width_counter++;
                     }
                 }
                 else{
                     difference = config->unfocused_cell_max_width - strlen(table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < difference && width_counter < config->window_width; k++){
-                        display(" ");
+                        display(" ", output);
                         width_counter++;
                     }
                     if(difference < 0){
                         for(int k = 0; k < config->unfocused_cell_max_width && width_counter < config->window_width; k++){
                             char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
-                            display(char_buffer);
+                            display(char_buffer, output);
                             // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
                             width_counter++;
                         }
@@ -783,23 +784,23 @@ void Print_Table(table_type table_object, config_type config){
                         // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                         for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                             char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k];
-                            display(char_buffer);
+                            display(char_buffer, output);
                             width_counter++;
                         }
                     }
                 }
             }
             if(width_counter < config->window_width){
-                display("|");
+                display("|", output);
                 width_counter++;
             }
         }
         // if(i == table_object->active_line && table_object->active_column == -1){
         //     S_Default_Colors(config, output);
         // }
-        Default_Colors(config);
+        Default_Colors(config, output);
         while(width_counter < config->window_width){
-            display(" ");
+            display(" ", output);
             width_counter++;
         }
     }
@@ -808,55 +809,55 @@ void Print_Table(table_type table_object, config_type config){
 
     width_counter = 0;
     if(table_object->table_width > 0){
-        Default_Colors(config);
-        display("+");
+        Default_Colors(config, output);
+        display("+", output);
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
         if(i == table_object->active_column){
             if(table_object->active_line == -2){
-                Selection_Content_Colors(config);
+                Selection_Content_Colors(config, output);
             }
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->focused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->focused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
                 for(int j = 0; j < table_object->cell_width[table_object->columns_order_of_display[i]] && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
             else{
                 for(int j = 0; j < config->unfocused_cell_max_width && width_counter < config->window_width; j++){
-                    display("-");
+                    display("-", output);
                     width_counter++;
                 }
             }
         }
         if(width_counter < config->window_width){
-            display("+");
+            display("+", output);
             width_counter++;
         }
     }
     while(width_counter < config->window_width){
-        display(" ");
+        display(" ", output);
         width_counter++;
     }
     for(int i = table_object->table_length; i < max_lines_to_print; i++){
         for(int j = 0; j < config->window_width; j++){
-            display(" ");
+            display(" ", output);
         }
     }
     // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
@@ -864,26 +865,26 @@ void Print_Table(table_type table_object, config_type config){
     // strcat(output, table_object->command);
     for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
         if(i == table_object->command_character_highlighted){
-            Selection_Content_Colors(config);
+            Selection_Content_Colors(config, output);
         }
         char_buffer[0] = table_object->command[table_object->active_command][i];
-        display(char_buffer);
+        display(char_buffer, output);
         if(i == table_object->command_character_highlighted){
-            Default_Colors(config);
+            Default_Colors(config, output);
         }
     }
     //display(table_object->command[0]);
     if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
-        Selection_Content_Colors(config);
-        display(" ");
-        Default_Colors(config);
+        Selection_Content_Colors(config, output);
+        display(" ", output);
+        Default_Colors(config, output);
         for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < config->window_width; i++){
-            display(" ");
+            display(" ", output);
         }
     }
     else{
         for(int i = strlen(table_object->command[table_object->active_command]); i < config->window_width; i++){
-            display(" ");
+            display(" ", output);
         }
     }
     

@@ -5,11 +5,13 @@
 #include "./config.h"
 
 void display(const char *string, char *output, ...);
-void Default_Colors(config_type config);
-void Reset_Colors(config_type config);
-void Odd_Line_Colors(config_type config);
-void Even_Line_Colors(config_type config);
-void Selection_Content_Colors(config_type config);
+void no_output_string_display(const char *string, ...);
+
+void Default_Colors(config_type config, char *string);
+void Reset_Colors(config_type config, char *string);
+void Odd_Line_Colors(config_type config, char *string);
+void Even_Line_Colors(config_type config, char *string);
+void Selection_Content_Colors(config_type config, char *string);
 
 void S_Default_Colors(config_type config, char *string);
 void S_Reset_Colors(config_type config, char *string);
@@ -18,8 +20,8 @@ void S_Even_Line_Colors(config_type config, char *string);
 void S_Selection_Content_Colors(config_type config, char *string);
 
 #ifdef __linux__
-void Hide_Cursor();
-void Show_Cursor();
+void Hide_Cursor(char *string);
+void Show_Cursor(char *string);
 #endif
 #ifdef _WIN64
 void S_Hide_Cursor(char *string);

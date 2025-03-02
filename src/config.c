@@ -254,43 +254,43 @@ void Set_Max_Table_Length(config_type config){
 
 #ifdef __linux__
 void Print_Config(config_type config){
-    display("Configuration :\n");
-    display("General :\n");
-    display("\tInstallation directory : %s\n", config->installation_directory);
-    display("Colors :\n");
-    display("\tDefault background color : %d\n", config->default_background_color);
-    display("\tDefault text color : %d\n", config->default_text_color);
-    display("\tBackground header color : %d\n", config->background_header_color);
-    display("\tText header color : %d\n", config->text_header_color);
-    display("\tOdd background line color : %d\n", config->odd_background_line_color);
-    display("\tOdd text line color : %d\n", config->odd_text_line_color);
-    display("\tEven background line color : %d\n", config->even_background_line_color);
-    display("\tEven text line color : %d\n", config->even_text_line_color);
-    display("\tSelection background color : %d\n", config->selection_background_color);
-    display("\tSelection text color : %d\n", config->selection_text_color);
-    display("Table :\n");
+    no_output_string_display("Configuration :\n");
+    no_output_string_display("General :\n");
+    no_output_string_display("\tInstallation directory : %s\n", config->installation_directory);
+    no_output_string_display("Colors :\n");
+    no_output_string_display("\tDefault background color : %d\n", config->default_background_color);
+    no_output_string_display("\tDefault text color : %d\n", config->default_text_color);
+    no_output_string_display("\tBackground header color : %d\n", config->background_header_color);
+    no_output_string_display("\tText header color : %d\n", config->text_header_color);
+    no_output_string_display("\tOdd background line color : %d\n", config->odd_background_line_color);
+    no_output_string_display("\tOdd text line color : %d\n", config->odd_text_line_color);
+    no_output_string_display("\tEven background line color : %d\n", config->even_background_line_color);
+    no_output_string_display("\tEven text line color : %d\n", config->even_text_line_color);
+    no_output_string_display("\tSelection background color : %d\n", config->selection_background_color);
+    no_output_string_display("\tSelection text color : %d\n", config->selection_text_color);
+    no_output_string_display("Table :\n");
     if(config->table_type == 0)
-        display("\tTable type : static\n");
+        no_output_string_display("\tTable type : static\n");
     else if(config->table_type == 1)
-        display("\tTable type : dynamic\n");
+        no_output_string_display("\tTable type : dynamic\n");
     else
-        display("\tTable type : UNRECOGNIZED\n");
-    display("\tFile line max length : %d\n", config->file_line_max_length);
-    display("\tFile max length : %d\n", config->file_max_length);
-    display("\tUnfocused cell max width : %d\n", config->unfocused_cell_max_width);
-    display("\tFocused cell max width : %d\n", config->focused_cell_max_width);
-    display("\tCell max width : %d\n", config->cell_max_width);
-    display("\tTable length : %d\n", config->max_table_length);
-    display("Session config :\n");
-    display("\tInput mode : %s\n", config->input_mode);
-    display("\tInput file : %s\n", config->input_file);
-    display("\tInput separator : %c\n", config->input_separator);
-    display("\tOutput separator : %c\n", config->output_separator);
-    display("Window specifications :\n");
-    display("\tWindow width : %d\n", config->window_width);
-    display("\tWindow length : %d\n", config->window_length);
-    display("Other :\n");
-    display("\tCommands history length : %d\n", config->commands_history_length);
+        no_output_string_display("\tTable type : UNRECOGNIZED\n");
+    no_output_string_display("\tFile line max length : %d\n", config->file_line_max_length);
+    no_output_string_display("\tFile max length : %d\n", config->file_max_length);
+    no_output_string_display("\tUnfocused cell max width : %d\n", config->unfocused_cell_max_width);
+    no_output_string_display("\tFocused cell max width : %d\n", config->focused_cell_max_width);
+    no_output_string_display("\tCell max width : %d\n", config->cell_max_width);
+    no_output_string_display("\tTable length : %d\n", config->max_table_length);
+    no_output_string_display("Session config :\n");
+    no_output_string_display("\tInput mode : %s\n", config->input_mode);
+    no_output_string_display("\tInput file : %s\n", config->input_file);
+    no_output_string_display("\tInput separator : %c\n", config->input_separator);
+    no_output_string_display("\tOutput separator : %c\n", config->output_separator);
+    no_output_string_display("Window specifications :\n");
+    no_output_string_display("\tWindow width : %d\n", config->window_width);
+    no_output_string_display("\tWindow length : %d\n", config->window_length);
+    no_output_string_display("Other :\n");
+    no_output_string_display("\tCommands history length : %d\n", config->commands_history_length);
     refresh();
     nodelay(stdscr, FALSE);
     getch();

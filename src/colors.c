@@ -10,35 +10,39 @@
 #include "../lib/colors.h"
 
 #ifdef __linux__
-void display(const char *string, ...){
+void display(const char *string, char *output, ...){
     printw(string);
 }
 
-void Default_Colors(config_type config){
+void no_output_string_display(const char *string, ...){
+    printw(string);
+}
+
+void Default_Colors(config_type config, char *string){
     attron(COLOR_PAIR(1));
 }
 
-void Reset_Colors(config_type config){
-    Default_Colors(config);
+void Reset_Colors(config_type config, char *string){
+    Default_Colors(config, string);
 }
 
-void Odd_Line_Colors(config_type config){
+void Odd_Line_Colors(config_type config, char *string){
     attron(COLOR_PAIR(3));
 }
 
-void Even_Line_Colors(config_type config){
+void Even_Line_Colors(config_type config, char *string){
     attron(COLOR_PAIR(4));
 }
 
-void Selection_Content_Colors(config_type config){
+void Selection_Content_Colors(config_type config, char *string){
     attron(COLOR_PAIR(5));
 }
 
-void Hide_Cursor(){
+void Hide_Cursor(char *string){
     curs_set(0);
 }
 
-void Show_Cursor(){
+void Show_Cursor(char *string){
     curs_set(1);
 }
 
@@ -51,7 +55,6 @@ void Clear_Screen_By_Cleaning(){
 }
 
 void Scrollback_To_Screen_Start(){
-    //system("clear");
     clear();
 }
 #endif
