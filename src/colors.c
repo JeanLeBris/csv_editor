@@ -10,7 +10,7 @@
 #include "../lib/colors.h"
 
 #ifdef __linux__
-void display(const char *string, char *output, ...){
+void add_to_display_buffer(const char *string, char *output, ...){
     printw(string);
 }
 
@@ -60,63 +60,51 @@ void Scrollback_To_Screen_Start(){
 #endif
 
 #ifdef _WIN64
-void display(const char *string, char *output, ...){
+void add_to_display_buffer(const char *string, char *output, ...){
     strcat(output, string);
 }
 
-void Default_Colors(config_type config){
-    printf("\e[%d;%dm", config->default_background_color, config->default_text_color);
+void no_output_string_display(const char *string, ...){
+    printf(string);
 }
 
-void Reset_Colors(config_type config){
-    Default_Colors(config);
+void display(const char *string){
+    printf("%s", string);
 }
 
-void Odd_Line_Colors(config_type config){
-    printf("\e[%d;%dm", config->odd_background_line_color, config->odd_text_line_color);
-}
-
-void Even_Line_Colors(config_type config){
-    printf("\e[%d;%dm", config->even_background_line_color, config->even_text_line_color);
-}
-
-void Selection_Content_Colors(config_type config){
-    printf("\e[%d;%dm", config->selection_background_color, config->selection_text_color);
-}
-
-void S_Default_Colors(config_type config, char *string){
+void Default_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->default_background_color, config->default_text_color);
     strcat(string, buffer);
 }
 
-void S_Reset_Colors(config_type config, char *string){
-    S_Default_Colors(config, string);
+void Reset_Colors(config_type config, char *string){
+    Default_Colors(config, string);
 }
 
-void S_Odd_Line_Colors(config_type config, char *string){
+void Odd_Line_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->odd_background_line_color, config->odd_text_line_color);
     strcat(string, buffer);
 }
 
-void S_Even_Line_Colors(config_type config, char *string){
+void Even_Line_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->even_background_line_color, config->even_text_line_color);
     strcat(string, buffer);
 }
 
-void S_Selection_Content_Colors(config_type config, char *string){
+void Selection_Content_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->selection_background_color, config->selection_text_color);
     strcat(string, buffer);
 }
 
-void S_Hide_Cursor(char *string){
+void Hide_Cursor(char *string){
     strcat(string, "\e[?25l");
 }
 
-void S_Show_Cursor(char *string){
+void Show_Cursor(char *string){
     strcat(string, "\e[?25h");
 }
 

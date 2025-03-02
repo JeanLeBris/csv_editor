@@ -82,12 +82,7 @@ int main(int argc, char **argv){
             Set_Window_Size(config);
             // Clear_Screen_By_Scrolldown();
             // Print_Config(config);
-            #ifdef __linux__
             Print_Table(table_object, config);
-            #endif
-            #ifdef _WIN64
-            S_Print_Table(table_object, config);
-            #endif
             // _sleep(100);
             for(;;){
                 #ifdef __linux__
