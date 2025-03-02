@@ -248,7 +248,7 @@ void Print_Table(table_type table_object, config_type config){
     Scrollback_To_Screen_Start();
     #endif
     #ifdef _WIN64
-    char *output = (char*)malloc(config->window_length * config->window_width * 2 * sizeof(char));
+    output = (char*)malloc(config->window_length * config->window_width * 2 * sizeof(char));
     strcpy(output, "\0");
     #endif
     Hide_Cursor(output);
