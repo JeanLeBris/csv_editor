@@ -16,6 +16,11 @@ void add_to_display_buffer(const char *string, char *output, ...){
 
 void no_output_string_display(const char *string, ...){
     printw(string);
+    refresh();
+}
+
+void display(const char *string){
+    refresh();
 }
 
 void Default_Colors(config_type config, char *string){
