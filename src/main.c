@@ -579,7 +579,7 @@ int main(int argc, char **argv){
                             table_object->command_character_highlighted = 0;
                             break;
                         }
-                        else if(c == -32){
+                        else if(c == -32 || c == 0){
                             c = getch();
                             if(c == 72){    // Up
                                 if(table_object->active_line > -2){   // Go up
@@ -616,7 +616,7 @@ int main(int argc, char **argv){
                             table_object->command_character_highlighted = 0;
                             break;
                         }
-                        else if(c == -32){
+                        else if(c == -32 || c == 0){
                             c = getch();
                             if(c == 72){    // Up
                                 if(table_object->active_column == -1 && table_object->active_line > -1){    // Move line up
@@ -736,7 +736,7 @@ int main(int argc, char **argv){
                             state = REGULAR_STATE;
                             break;
                         }
-                        else if(c == -32){
+                        else if(c == -32 || c == 0){
                             c = getch();
                             if(c == 72){    // Up
                                 if(table_object->active_command < config->commands_history_length && strlen(table_object->command[table_object->active_command + 1]) > 0){
@@ -841,7 +841,7 @@ int main(int argc, char **argv){
                             table_object->first_character_printed = -1;
                             break;
                         }
-                        else if(c == -32){
+                        else if(c == -32 || c == 0){
                             c = getch();
                             if(c == 72){    // Up
                                 

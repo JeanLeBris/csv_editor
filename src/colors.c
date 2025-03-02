@@ -57,6 +57,10 @@ void Scrollback_To_Screen_Start(){
 #endif
 
 #ifdef _WIN64
+void display(const char *string, char *output, ...){
+    strcat(output, string);
+}
+
 void Default_Colors(config_type config){
     printf("\e[%d;%dm", config->default_background_color, config->default_text_color);
 }
