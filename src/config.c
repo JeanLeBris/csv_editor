@@ -57,7 +57,6 @@ void Set_Default_Config(config_type config, char *exe_path){
 
     config->commands_history_length = 100;
 
-    strcpy(config->input_mode, "");
     strcpy(config->input_file, "");
 
     config->show_config = 0;
@@ -193,15 +192,16 @@ void Load_Config(config_type config){
 
 void Get_Config_From_Args(config_type config, int argc, char **argv){
     for(int i = 1; i < argc; i++){
-        if(strcmp(argv[i], "--input_mode") == 0 || strcmp(argv[i], "-im") == 0){
+        if(strcmp(argv[i], "--input") == 0 || strcmp(argv[i], "-i") == 0){
             if(i + 1 < argc && argv[i + 1][0] != "-"){
-                strcpy(config->input_mode, argv[i + 1]);
+                strcpy(config->input_file, argv[i + 1]);
                 i++;
             }
         }
-        else if(strcmp(argv[i], "--input") == 0 || strcmp(argv[i], "-i") == 0){
+        else if(strcmp(argv[i], "--separator") == 0 || strcmp(argv[i], "-sep") == 0){
             if(i + 1 < argc && argv[i + 1][0] != "-"){
-                strcpy(config->input_file, argv[i + 1]);
+                config->input_separator = argv[i + 1][0];
+                config->output_separator = config->input_separator;
                 i++;
             }
         }
@@ -281,7 +281,6 @@ void Print_Config(config_type config){
     no_output_string_display("\tCell max width : %d\n", config->cell_max_width);
     no_output_string_display("\tTable length : %d\n", config->max_table_length);
     no_output_string_display("Session config :\n");
-    no_output_string_display("\tInput mode : %s\n", config->input_mode);
     no_output_string_display("\tInput file : %s\n", config->input_file);
     no_output_string_display("\tInput separator : %c\n", config->input_separator);
     no_output_string_display("\tOutput separator : %c\n", config->output_separator);
