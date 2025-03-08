@@ -526,7 +526,15 @@ void Print_Table(table_type table_object, config_type config){
                     Selection_Content_Colors(config, output);
                     add_to_display_buffer(" ", output);
                     Default_Colors(config, output);
+                    // The following code is made so that the columns stay aligned well,
+                    // otherwise the following lines end up misaligned one character on the left or one character on the right.
+                    // It is probably due to a missing or one too much increment to the width_counter variable somewhere in the code.
+                    // I looked through the code to properly fix it but I didn't find it.
+                    // This piece of code isn't exactly great but it seems to fix it
                     width_counter++;
+                    if(table_object->character_highlighted > config->focused_cell_max_width-1){
+                        width_counter--;
+                    }
                 }
             }
             Default_Colors(config, output);
@@ -748,7 +756,15 @@ void Print_Table(table_type table_object, config_type config){
                         Selection_Content_Colors(config, output);
                         add_to_display_buffer(" ", output);
                         Default_Colors(config, output);
+                        // The following code is made so that the columns stay aligned well,
+                        // otherwise the following lines end up misaligned one character on the left or one character on the right.
+                        // It is probably due to a missing or one too much increment to the width_counter variable somewhere in the code.
+                        // I looked through the code to properly fix it but I didn't find it.
+                        // This piece of code isn't exactly great but it seems to fix it
                         width_counter++;
+                        if(table_object->character_highlighted > config->focused_cell_max_width-1){
+                            width_counter--;
+                        }
                     }
                 }
                 // Default_Colors(config);
