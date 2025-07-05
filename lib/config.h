@@ -28,7 +28,7 @@ typedef struct config_type{
 
     int commands_history_length;
 
-    char input_file[50];
+    char input_file[200];
 
     int window_width;
     int window_length;
