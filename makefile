@@ -10,7 +10,7 @@ OBJNAMES= $(SRCNAMES:.c=.o)
 export OBJDIR=obj
 OBJ= $(foreach objname, $(OBJNAMES), $(OBJDIR)/$(objname))
 export BINDIR=bin
-export DEPENDENCIES= deallocator
+export DEPENDENCIES=
 
 ifeq ($(OS), Windows)
 	RMDIR= rmdir
