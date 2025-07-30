@@ -1,70 +1,77 @@
-compile:csv_editor.exe
+export OS
+export CC=gcc
+export CFLAGS= -Wall
+export LDFLAGS= -Wall
+export EXEC=csv_editor
+SRCNAMES= main.c table.c actions.c colors.c config.c
+export SRCDIR=src
+SRC= $(foreach srcname, $(SRCNAMES), $(SRCDIR)/$(srcname))
+OBJNAMES= $(SRCNAMES:.c=.o)
+export OBJDIR=obj
+OBJ= $(foreach objname, $(OBJNAMES), $(OBJDIR)/$(objname))
+export BINDIR=bin
+export DEPENDENCIES= deallocator
 
+ifeq ($(OS), Windows)
+	RMDIR= rmdir
+	RMFILE= del /s /q
+	COPYFILE= copy
+	SHARED_LIBRARY_EXT= dll
+	FILE_SLASH=\\
 
+else
+ifeq ($(OS), Windows_NT)
+	OS=Windows
+	RMDIR= rmdir
+	RMFILE= del /s /q
+	COPYFILE= copy
+	SHARED_LIBRARY_EXT= dll
+	FILE_SLASH=\\
 
-################################################################################
-# Compilation process for Linux OS                                             #
-################################################################################
+else
+ifeq ($(OS), Linux)
+	RMDIR= rmdir
+	RMFILE= rm
+	COPYFILE= cp
+	SHARED_LIBRARY_EXT= so
+	FILE_SLASH=/
+	LDFLAGS+= -lncurses
+endif
+endif
+endif
 
-# csv_editor.exe:obj/main.o obj/config.o obj/colors.o obj/table.o obj/actions.o obj
-# 	gcc -Wall obj/main.o obj/config.o obj/colors.o obj/table.o obj/actions.o -o csv_editor.exe -lncurses
+export RMDIR
+export RMFILE
+export COPYFILE
+export SHARED_LIBRARY_EXT
+export FILE_SLASH
 
-# obj/main.o:src/main.c obj
-# 	gcc -Wall -c src/main.c -o obj/main.o -lncurses
+ifeq ($(LIBRARY_TYPE), shared)
+else
+	ifeq ($(LIBRARY_TYPE), static)
+	else
+		LIBRARY_TYPE=shared
+	endif
+endif
+export LIBRARY_TYPE
 
-# obj/config.o:src/config.c obj
-# 	gcc -Wall -c src/config.c -o obj/config.o -lncurses
+compile:bin obj $(OBJNAMES)
+	$(CC) $(LDFLAGS) $(OBJ) -o $(EXEC)
 
-# obj/colors.o:src/colors.c obj
-# 	gcc -Wall -c src/colors.c -o obj/colors.o -lncurses
+%.o:
+	$(CC) $(CFLAGS) -c $(SRCDIR)/$(@:.o=.c) -o $(OBJDIR)/$@
 
-# obj/table.o:src/table.c obj
-# 	gcc -Wall -c src/table.c -o obj/table.o -lncurses
+.PHONY: compile clean
 
-# obj/actions.o:src/actions.c obj
-# 	gcc -Wall -c src/actions.c -o obj/actions.o -lncurses
-
-# obj:
-# 	mkdir obj
-
-
-
-################################################################################
-# Compilation process for Windows OS                                           #
-################################################################################
-
-csv_editor.exe:obj/main.o obj/config.o obj/colors.o obj/table.o obj/actions.o obj
-	gcc -Wall obj/main.o obj/config.o obj/colors.o obj/table.o obj/actions.o -o csv_editor.exe
-
-obj/main.o:src/main.c obj
-	gcc -Wall -c src/main.c -o obj/main.o
-
-obj/config.o:src/config.c obj
-	gcc -Wall -c src/config.c -o obj/config.o
-
-obj/colors.o:src/colors.c obj
-	gcc -Wall -c src/colors.c -o obj/colors.o
-
-obj/table.o:src/table.c obj
-	gcc -Wall -c src/table.c -o obj/table.o
-
-obj/actions.o:src/actions.c obj
-	gcc -Wall -c src/actions.c -o obj/actions.o
+bin:
+	mkdir bin
 
 obj:
 	mkdir obj
 
-
-
-################################################################################
-# Supplementary tools                                                          #
-################################################################################
-
 clean:
-	rm -r obj
-
-clear:clean
-	rm *.exe
-
-zip:
-	zip "csv_editor.zip" src/*.c lib/*.h csv_editor.conf README.md makefile LICENSE
+	$(RMFILE) $(OBJDIR)$(FILE_SLASH)*
+	$(RMDIR) $(OBJDIR)
+	$(RMFILE) $(BINDIR)$(FILE_SLASH)*
+	$(RMDIR) $(BINDIR)
+	$(RMFILE) *.exe
