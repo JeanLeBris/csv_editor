@@ -46,6 +46,9 @@ void Set_Default_Config(config_type config, char *exe_path){
     init_pair(5, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
     #endif
 
+    strcpy(config->new_column_text, "[New column]");
+    strcpy(config->new_line_text, "[New line]");
+
     config->table_type = 0; // static
     config->file_line_max_length = 1000;
     config->file_max_length = 1000;
@@ -130,6 +133,12 @@ void Load_Config(config_type config){
             // strcpy(config->selection_text_color, strtok(NULL, seps));
             config->selection_text_color = atoi(strtok(NULL, seps));
             // printf("%s\n", config->selection_text_color);
+        }
+        else if(strcmp(fragmented_line, "new_column_text") == 0){
+            strcpy(config->new_column_text, strtok(NULL, seps));
+        }
+        else if(strcmp(fragmented_line, "new_line_text") == 0){
+            strcpy(config->new_line_text, strtok(NULL, seps));
         }
         else if(strcmp(fragmented_line, "table_type") == 0){
             // strcpy(config->table_type, strtok(NULL, seps));
@@ -267,6 +276,8 @@ void Print_Config(config_type config){
     no_output_string_display("\tEven text line color : %d\n", config->even_text_line_color);
     no_output_string_display("\tSelection background color : %d\n", config->selection_background_color);
     no_output_string_display("\tSelection text color : %d\n", config->selection_text_color);
+    no_output_string_display("\tNew column text : %s\n", config->new_column_text);
+    no_output_string_display("\tNew line text : %s\n", config->new_line_text);
     no_output_string_display("Table :\n");
     if(config->table_type == 0)
         no_output_string_display("\tTable type : static\n");

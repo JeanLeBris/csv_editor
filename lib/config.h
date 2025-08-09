@@ -16,6 +16,9 @@ typedef struct config_type{
     int selection_background_color;
     int selection_text_color;
 
+    char new_column_text[100];
+    char new_line_text[100];
+
     int table_type;
     int file_line_max_length;
     int file_max_length;
