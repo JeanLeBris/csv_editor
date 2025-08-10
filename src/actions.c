@@ -212,11 +212,22 @@ int execute_command(table_type table_object, config_type config, int commands_hi
     int buffer = 0;
     int running = 1;
     char *command_buffer = NULL;
+    char seps[] = " \n\"";
     if(table_object->active_command != 0){
         strcpy(table_object->command[0], table_object->command[table_object->active_command]);
     }
     command_buffer = table_object->command[0];
     if(strcmp(command_buffer, ":q") == 0){
+        running = 0;
+    }
+    else if(strstr(command_buffer, ":wq") == command_buffer){
+        command_buffer = strstr(command_buffer, ":wq") + strlen(":wq");
+        command_buffer = strtok(command_buffer, seps);
+        if(command_buffer != NULL){
+            strcpy(config->input_file, command_buffer);
+        }
+        Save_Table(table_object, config);
+        
         running = 0;
     }
     else if(strstr(command_buffer, ":jump ") == command_buffer){
