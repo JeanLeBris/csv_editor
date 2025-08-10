@@ -262,6 +262,7 @@ void Print_Table(table_type table_object, config_type config){
     int sum = 0;
     int iteration_limit = 10;
     int iterator = 0;
+    // Check and set the line number by which the display should start
     if(table_object->active_line < table_object->first_line_printed){
         if(table_object->active_line >= 0){
             table_object->first_line_printed = table_object->active_line;
@@ -273,6 +274,7 @@ void Print_Table(table_type table_object, config_type config){
     else if(table_object->active_line > table_object->first_line_printed + max_lines_to_print - 1){
         table_object->first_line_printed = table_object->active_line - max_lines_to_print + 1;
     }
+    // Change cell width in case a change was made to a cell
     if(table_object->character_highlighted != -1){
         if(table_object->active_line == -1){
             if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) + 1 > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
@@ -287,9 +289,11 @@ void Print_Table(table_type table_object, config_type config){
             }
         }
     }
+    // Finds which column to print first
     sum = config->window_width + 1;
     iterator = 0;
     while(sum > config->window_width && iterator < iteration_limit){
+        // Get the amount of character columns the terminal would need with the current values of first_column_printed and active_column, if it is larger than the actual terminal, it increments first_column_printed
         sum = 1;
         for(int i = table_object->first_column_printed; i <= table_object->active_column; i++){
             if(i == table_object->active_column){
@@ -312,12 +316,13 @@ void Print_Table(table_type table_object, config_type config){
         if(sum > config->window_width){
             table_object->first_column_printed++;
         }
+        // This case scenario is when the active_column is strictly lower than the first_column_printed
         else if(sum == 1 && table_object->first_column_printed > 0){
             table_object->first_column_printed--;
         }
         iterator++;
     }
-    // sum = config->focused_cell_max_width + 1;
+    // Finds which character to print first in selected cell
     if(table_object->character_highlighted > -1){
         if(table_object->active_column > -1 && table_object->active_line == -1){
             if(table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
@@ -371,6 +376,8 @@ void Print_Table(table_type table_object, config_type config){
 
     // Header part
 
+    // Write table border
+    width_counter = 0;
     if(table_object->table_width > 0){
         Default_Colors(config, output);
         add_to_display_buffer("+", output);
@@ -418,6 +425,7 @@ void Print_Table(table_type table_object, config_type config){
         add_to_display_buffer(" ", output);
         width_counter++;
     }
+    // Print header content
     width_counter = 0;
     if(table_object->table_width > 0){
         if(table_object->active_line == -1 && table_object->active_column == -1){                // To fix
@@ -589,6 +597,7 @@ void Print_Table(table_type table_object, config_type config){
         add_to_display_buffer(" ", output);
         width_counter++;
     }
+    // Write table border
     width_counter = 0;
     if(table_object->table_width > 0){
         Default_Colors(config, output);
@@ -640,6 +649,7 @@ void Print_Table(table_type table_object, config_type config){
 
     // Body part
 
+    // Print body content
     for(int i = table_object->first_line_printed; i < table_object->table_length && (i - table_object->first_line_printed) < max_lines_to_print; i++){
         width_counter = 0;
         if((i + 1)%2 == 0){
@@ -830,6 +840,7 @@ void Print_Table(table_type table_object, config_type config){
 
     // Last line
 
+    // Write table border
     width_counter = 0;
     if(table_object->table_width > 0){
         Default_Colors(config, output);
@@ -878,14 +889,13 @@ void Print_Table(table_type table_object, config_type config){
         add_to_display_buffer(" ", output);
         width_counter++;
     }
+    // Fill the empty lines
     for(int i = table_object->table_length; i < max_lines_to_print; i++){
         for(int j = 0; j < config->window_width; j++){
             add_to_display_buffer(" ", output);
         }
     }
-    // sprintf(char_buffer, "%d\t%d\t", table_object->first_character_printed, table_object->character_highlighted);
-    // strcat(output, char_buffer);
-    // strcat(output, table_object->command);
+    // Print comand
     for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
         if(i == table_object->command_character_highlighted){
             Selection_Content_Colors(config, output);
@@ -896,7 +906,7 @@ void Print_Table(table_type table_object, config_type config){
             Default_Colors(config, output);
         }
     }
-    //add_to_display_buffer(table_object->command[0]);
+    // Fill the rest of the characters after the comand
     if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
         Selection_Content_Colors(config, output);
         add_to_display_buffer(" ", output);
@@ -911,6 +921,7 @@ void Print_Table(table_type table_object, config_type config){
         }
     }
     
+    // Check later
     if(table_object->character_highlighted != -1 && width_of_cell_changed){
         if(table_object->active_line == -1){
             table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]);
