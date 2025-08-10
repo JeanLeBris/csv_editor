@@ -208,18 +208,19 @@ int on_command_go_right(table_type table_object){
     return 0;
 }
 
-int execute_command(table_type table_object, int commands_history_length){
+int execute_command(table_type table_object, config_type config, int commands_history_length){
     int buffer = 0;
     int running = 1;
     char *command_buffer = NULL;
     if(table_object->active_command != 0){
         strcpy(table_object->command[0], table_object->command[table_object->active_command]);
     }
-    if(strcmp(table_object->command[0], ":q") == 0){
+    command_buffer = table_object->command[0];
+    if(strcmp(command_buffer, ":q") == 0){
         running = 0;
     }
-    else if(strstr(table_object->command[0], ":jump ") == table_object->command[0]){
-        command_buffer = strstr(table_object->command[0], ":jump ") + strlen(":jump ");
+    else if(strstr(command_buffer, ":jump ") == command_buffer){
+        command_buffer = strstr(command_buffer, ":jump ") + strlen(":jump ");
         buffer = atoi(command_buffer) - 1;
         if(buffer < -1){
             table_object->active_line = -2;
@@ -229,6 +230,81 @@ int execute_command(table_type table_object, int commands_history_length){
         }
         else{
             table_object->active_line = buffer;
+        }
+    }
+    else if(strstr(command_buffer, ":new ") == command_buffer){
+        command_buffer = strstr(command_buffer, ":new ") + strlen(":new ");
+        if(strstr(command_buffer, "column") == command_buffer){
+            command_buffer = strstr(command_buffer, "column") + strlen("column");
+
+            char **new_header = malloc((table_object->table_width + 1) * sizeof(*table_object->header));
+            for(int j = 0; j < table_object->active_column + 1; j++){
+                new_header[j] = table_object->header[table_object->columns_order_of_display[j]];
+            }
+            new_header[table_object->active_column + 1] = malloc((config->cell_max_width + 1) * sizeof(char));
+            new_header[table_object->active_column + 1][0] = '\0';
+            for(int j = table_object->active_column + 1; j < table_object->table_width; j++){
+                new_header[j+1] = table_object->header[table_object->columns_order_of_display[j]];
+            }
+            free(table_object->header);
+            table_object->header = new_header;
+
+            int *new_cell_width = malloc((table_object->table_width + 1) * sizeof(int));
+            for(int j = 0; j < table_object->active_column + 1; j++){
+                new_cell_width[j] = table_object->cell_width[table_object->columns_order_of_display[j]];
+            }
+            new_cell_width[table_object->active_column + 1] = 5;
+            for(int j = table_object->active_column + 1; j < table_object->table_width; j++){
+                new_cell_width[j+1] = table_object->cell_width[table_object->columns_order_of_display[j]];
+            }
+            free(table_object->cell_width);
+            table_object->cell_width = new_cell_width;
+
+            for(int j = 0; j < table_object->table_length; j++){
+                char **new_table_line = malloc((table_object->table_width + 1) * sizeof(char *));
+                // table_object->table[j] = malloc(table_object->table_width * sizeof(char *));
+                for(int k = 0; k < table_object->active_column + 1; k++){
+                    new_table_line[k] = table_object->table[j][table_object->columns_order_of_display[k]];
+                }
+                new_table_line[table_object->active_column + 1] = malloc((config->cell_max_width + 1) * sizeof(char));
+                new_table_line[table_object->active_column + 1][0] = '\0';
+                for(int k = table_object->active_column + 1; k < table_object->table_width; k++){
+                    new_table_line[k+1] = table_object->table[j][table_object->columns_order_of_display[k]];
+                }
+                free(table_object->table[j]);
+                table_object->table[j] = new_table_line;
+            }
+
+            int *new_columns_order_of_display = malloc((table_object->table_width + 1) * sizeof(int));
+            for(int j = 0; j < table_object->table_width + 1; j++){
+                new_columns_order_of_display[j] = j;
+            }
+            free(table_object->columns_order_of_display);
+            table_object->columns_order_of_display = new_columns_order_of_display;
+
+            table_object->table_width++;
+            table_object->active_column++;
+        }
+        if(strstr(command_buffer, "line") == command_buffer){
+            command_buffer = strstr(command_buffer, "line") + strlen("line");
+
+            char ***new_table = malloc((table_object->table_length + 1) * sizeof(char **));
+            for(int j = 0; j < table_object->active_line + 1; j++){
+                new_table[j] = table_object->table[j];
+            }
+            new_table[table_object->active_line + 1] = malloc(table_object->table_width * sizeof(char *));
+            for(int k = 0; k < table_object->table_width; k++){
+                new_table[table_object->active_line + 1][k] = malloc((config->cell_max_width + 1) * sizeof(char));
+                new_table[table_object->active_line + 1][k][0] = '\0';
+            }
+            for(int j = table_object->active_line + 1; j < table_object->table_length; j++){
+                new_table[j+1] = table_object->table[j];
+            }
+            free(table_object->table);
+            table_object->table = new_table;
+
+            table_object->table_length++;
+            table_object->active_line++;
         }
     }
     buffer = 0;

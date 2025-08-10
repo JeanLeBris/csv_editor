@@ -24,7 +24,7 @@ int on_command_go_down(table_type table_object);
 int on_command_go_left(table_type table_object);
 int on_command_go_right(table_type table_object);
 
-int execute_command(table_type table_object, int commands_history_length);
+int execute_command(table_type table_object, config_type config, int commands_history_length);
 
 int on_command_backspace(table_type table_object);
 int on_command_characters(table_type table_object, int command_string_size, char c);

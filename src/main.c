@@ -176,7 +176,7 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 10){   // enter
-                            running = execute_command(table_object, config->commands_history_length);
+                            running = execute_command(table_object, config, config->commands_history_length);
                             state = REGULAR_STATE;
                             refresh_screen_bool = 1;
                         }
@@ -297,7 +297,7 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(c == 13){   // enter
-                            running = execute_command(table_object, config->commands_history_length);
+                            running = execute_command(table_object, config, config->commands_history_length);
                             state = REGULAR_STATE;
                             refresh_screen_bool = 1;
                         }
