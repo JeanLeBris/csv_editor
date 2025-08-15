@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <assert.h>
+#include <math.h>
 #ifdef __linux__
 #include <ncurses.h>
 #endif
@@ -254,7 +255,7 @@ void Print_Table(table_type table_object, config_type config){
     Hide_Cursor(output);
     int width_of_cell_changed = 0;
     int difference = 0;
-    char char_buffer[10] = " ";
+    char char_buffer[20] = " ";
     int width_counter = 0;
     // Clear_Screen_By_Scrolldown();
     int amount_of_rows_reserved_for_content_other_than_rows = 5;    // the header is not considered a row
@@ -895,13 +896,21 @@ void Print_Table(table_type table_object, config_type config){
             add_to_display_buffer(" ", output);
         }
     }
-    // Print comand
+    // Print comand and stuff from the very last line
+    width_counter = 0;
+    int digit_count_length = table_object->table_length > 9 ? (int) floor(log10(table_object->table_length)) + 1 : 2;
+    int digit_count_width = table_object->table_width > 9 ? (int) floor(log10(table_object->table_width)) + 1 : 2;
+    int digit_active_line = table_object->active_line > 0 ? (int) floor(log10(table_object->active_line)) + 1 : (table_object->active_line < 0 ? 2 : 1);
+    int digit_active_column = table_object->active_column > 0 ? (int) floor(log10(table_object->active_column)) + 1 : (table_object->active_column < 0 ? 2 : 1);
+    int in_table_coord_size = digit_count_length + digit_count_width + 1;
+    int max_command_display_size = config->window_width - in_table_coord_size;
     for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
         if(i == table_object->command_character_highlighted){
             Selection_Content_Colors(config, output);
         }
         char_buffer[0] = table_object->command[table_object->active_command][i];
         add_to_display_buffer(char_buffer, output);
+        width_counter++;
         if(i == table_object->command_character_highlighted){
             Default_Colors(config, output);
         }
@@ -911,14 +920,26 @@ void Print_Table(table_type table_object, config_type config){
         Selection_Content_Colors(config, output);
         add_to_display_buffer(" ", output);
         Default_Colors(config, output);
-        for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < config->window_width; i++){
+        for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < max_command_display_size; i++){
             add_to_display_buffer(" ", output);
         }
     }
     else{
-        for(int i = strlen(table_object->command[table_object->active_command]); i < config->window_width; i++){
+        for(int i = strlen(table_object->command[table_object->active_command]); i < max_command_display_size; i++){
             add_to_display_buffer(" ", output);
         }
+    }
+    // Print coord information
+    for(int i = 0; i < digit_count_length - digit_active_line; i++){
+        add_to_display_buffer(" ", output);
+    }
+    itoa(table_object->active_line, char_buffer, 10);
+    add_to_display_buffer(char_buffer, output);
+    add_to_display_buffer(",", output);
+    itoa(table_object->active_column, char_buffer, 10);
+    add_to_display_buffer(char_buffer, output);
+    for(int i = 0; i < digit_count_width - digit_active_column; i++){
+        add_to_display_buffer(" ", output);
     }
     
     // Check later
