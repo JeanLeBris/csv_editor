@@ -232,7 +232,7 @@ int execute_command(table_type table_object, config_type config, int commands_hi
     }
     else if(strstr(command_buffer, ":jump ") == command_buffer){
         command_buffer = strstr(command_buffer, ":jump ") + strlen(":jump ");
-        buffer = atoi(command_buffer) - 1;
+        buffer = atoi(command_buffer);
         if(buffer < -1){
             table_object->active_line = -2;
         }
