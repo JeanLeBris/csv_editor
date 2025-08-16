@@ -10,6 +10,7 @@
 #include <windows.h>
 #endif
 #include "../lib/table.h"
+#include "../lib/constants.h"
 
 void Get_File_Characteristics(table_type table_object, config_type config){
     FILE *f = fopen(config->input_file, "r");
@@ -243,7 +244,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     fclose(f);
 }
 
-void Print_Table(table_type table_object, config_type config){
+void Print_Table(table_type table_object, config_type config, int state){
     char *output = NULL;
     #ifdef __linux__
     Scrollback_To_Screen_Start();
@@ -915,18 +916,39 @@ void Print_Table(table_type table_object, config_type config){
             Default_Colors(config, output);
         }
     }
+    switch(state){
+        case REGULAR_STATE:
+            add_to_display_buffer("-- SELECTION --", output);
+            width_counter += strlen("-- SELECTION --");
+            break;
+        case MOVE_STATE:
+            add_to_display_buffer("-- MOVE --", output);
+            width_counter += strlen("-- MOVE --");
+            break;
+        case COMMAND_STATE:
+            break;
+        case EDIT_STATE:
+            add_to_display_buffer("-- INSERT --", output);
+            width_counter += strlen("-- INSERT --");
+            break;
+        default:
+            break;
+    }
     // Fill the rest of the characters after the comand
     if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
         Selection_Content_Colors(config, output);
         add_to_display_buffer(" ", output);
+        width_counter++;
         Default_Colors(config, output);
-        for(int i = strlen(table_object->command[table_object->active_command]) + 1; i < max_command_display_size; i++){
+        for(int i = width_counter + 1; i < max_command_display_size; i++){
             add_to_display_buffer(" ", output);
+            width_counter++;
         }
     }
     else{
-        for(int i = strlen(table_object->command[table_object->active_command]); i < max_command_display_size; i++){
+        for(int i = width_counter; i < max_command_display_size; i++){
             add_to_display_buffer(" ", output);
+            width_counter++;
         }
     }
     // Print coord information

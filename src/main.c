@@ -84,7 +84,7 @@ int main(int argc, char **argv){
             Set_Window_Size(config);
             // Clear_Screen_By_Scrolldown();
             // Print_Config(config);
-            Print_Table(table_object, config);
+            Print_Table(table_object, config, state);
             // _sleep(100);
             refresh_screen_bool = 0;
             while(refresh_screen_bool == 0){
@@ -104,6 +104,7 @@ int main(int argc, char **argv){
                     if(state == REGULAR_STATE){
                         if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 'm'){
                             state = MOVE_STATE;
+                            refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 'i' && table_object->active_column > -1 && table_object->active_line > -2){
                             set_character_highlighted_to_last_character(table_object);
@@ -134,6 +135,7 @@ int main(int argc, char **argv){
                     else if(state == MOVE_STATE){
                         if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 'm' || stdin_buffer[0] == 'r')){
                             state = REGULAR_STATE;
+                            refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 27){
                             state = COMMAND_STATE;
@@ -223,6 +225,7 @@ int main(int argc, char **argv){
                     if(state == REGULAR_STATE){
                         if(c == 'm'){
                             state = MOVE_STATE;
+                            refresh_screen_bool = 1;
                         }
                         else if(c == 'i' && table_object->active_column > -1 && table_object->active_line > -2){
                             set_character_highlighted_to_last_character(table_object);
@@ -253,6 +256,7 @@ int main(int argc, char **argv){
                     else if(state == MOVE_STATE){
                         if(c == 'm' || c == 'r'){
                             state = REGULAR_STATE;
+                            refresh_screen_bool = 1;
                         }
                         else if(c == 27){
                             state = COMMAND_STATE;
