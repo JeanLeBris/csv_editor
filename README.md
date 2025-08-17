@@ -104,29 +104,37 @@ csv_editor offers a variety of possibilities for customization in 'csv_editor.co
 ### Color customization
 
 Color codes :
-- 3x : Regular text color
-- 4x : Regular background color
+- 3x : Dark text color
+- 4x : Dark background color
 - 9x : Bright text color
 - 10x : Bright background color
+- x0 : Black
+- x1 : Red
+- x2 : Green
+- x3 : Yellow
+- x4 : Blue
+- x5 : Magenta
+- x6 : Cyan
+- x7 : White
 
-```default_background_color = 40``` : 
+```default_background_color = 40``` : Sets the default color of the background.
 
-```default_text_color = 37``` : 
+```default_text_color = 37``` : Sets the default color of the text.
 
-```background_header_color = 40``` : 
+```background_header_color = 40``` : Sets the default color of the background of the header.
 
-```text_header_color = 34``` : 
+```text_header_color = 34``` : Sets the default color of the text of the background.
 
-```odd_background_line_color = 40``` : 
+```odd_background_line_color = 40``` : Sets the default color of the background for odd lines.
 
-```odd_text_line_color = 37``` : 
+```odd_text_line_color = 37``` : Sets the default color of the text for odd lines.
 
-```even_background_line_color = 100``` : 
+```even_background_line_color = 100``` : Sets the default color of the background for even lines.
 
-```even_text_line_color = 37``` : 
+```even_text_line_color = 37``` : Sets the default color of the text for even lines.
 
-```selection_background_color = 47``` : 
+```selection_background_color = 47``` : Sets the background color in selection areas.
 
-```selection_text_color = 30``` : 
+```selection_text_color = 30``` : Sets the text color in selection areas.
 
 ## In the program
