@@ -31,6 +31,10 @@ void Reset_Colors(config_type config, char *string){
     Default_Colors(config, string);
 }
 
+void Header_Colors(config_type config, char *string){
+    attron(COLOR_PAIR(2));
+}
+
 void Odd_Line_Colors(config_type config, char *string){
     attron(COLOR_PAIR(3));
 }
@@ -85,6 +89,12 @@ void Default_Colors(config_type config, char *string){
 
 void Reset_Colors(config_type config, char *string){
     Default_Colors(config, string);
+}
+
+void Header_Colors(config_type config, char *string){
+    char buffer[20] = "";
+    sprintf(buffer, "\e[%d;%dm", config->background_header_color, config->text_header_color);
+    strcat(string, buffer);
 }
 
 void Odd_Line_Colors(config_type config, char *string){
