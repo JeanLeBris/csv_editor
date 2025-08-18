@@ -955,10 +955,12 @@ void Print_Table(table_type table_object, config_type config, int state){
     for(int i = 0; i < digit_count_length - digit_active_line; i++){
         add_to_display_buffer(" ", output);
     }
-    itoa(table_object->active_line, char_buffer, 10);
+    // itoa(table_object->active_line, char_buffer, 10);
+    sprintf(char_buffer, "%d", table_object->active_line);
     add_to_display_buffer(char_buffer, output);
     add_to_display_buffer(",", output);
-    itoa(table_object->active_column, char_buffer, 10);
+    // itoa(table_object->active_column, char_buffer, 10);
+    sprintf(char_buffer, "%d", table_object->active_column);
     add_to_display_buffer(char_buffer, output);
     for(int i = 0; i < digit_count_width - digit_active_column; i++){
         add_to_display_buffer(" ", output);

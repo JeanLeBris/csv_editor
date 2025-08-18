@@ -35,7 +35,7 @@ ifeq ($(OS), Linux)
 	COPYFILE= cp
 	SHARED_LIBRARY_EXT= so
 	FILE_SLASH=/
-	LDFLAGS+= -lncurses
+	LDFLAGS+= -lncurses -lm
 endif
 endif
 endif
@@ -56,10 +56,10 @@ endif
 export LIBRARY_TYPE
 
 compile:bin obj $(OBJNAMES)
-	$(CC) $(LDFLAGS) $(OBJ) -o $(EXEC)
+	$(CC) $(OBJ) -o $(EXEC) $(LDFLAGS)
 
 %.o:
-	$(CC) $(CFLAGS) -c $(SRCDIR)/$(@:.o=.c) -o $(OBJDIR)/$@
+	$(CC) -c $(SRCDIR)/$(@:.o=.c) -o $(OBJDIR)/$@ $(CFLAGS)
 
 .PHONY: compile clean
 
