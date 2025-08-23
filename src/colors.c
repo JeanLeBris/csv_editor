@@ -32,23 +32,23 @@ void Reset_Colors(config_type config, char *string){
 }
 
 void Border_Colors(config_type config, char *string){
-    
+    // attron(COLOR_PAIR(2));
 }
 
 void Header_Text_Colors(config_type config, char *string){
-    attron(COLOR_PAIR(2));
-}
-
-void Odd_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(3));
 }
 
-void Even_Text_Colors(config_type config, char *string){
+void Odd_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(4));
 }
 
-void Selection_Content_Colors(config_type config, char *string){
+void Even_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(5));
+}
+
+void Selection_Content_Colors(config_type config, char *string){
+    attron(COLOR_PAIR(6));
 }
 
 void Hide_Cursor(char *string){
