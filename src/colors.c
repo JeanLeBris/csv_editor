@@ -31,15 +31,19 @@ void Reset_Colors(config_type config, char *string){
     Default_Colors(config, string);
 }
 
-void Header_Colors(config_type config, char *string){
+void Border_Colors(config_type config, char *string){
+    
+}
+
+void Header_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(2));
 }
 
-void Odd_Line_Colors(config_type config, char *string){
+void Odd_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(3));
 }
 
-void Even_Line_Colors(config_type config, char *string){
+void Even_Text_Colors(config_type config, char *string){
     attron(COLOR_PAIR(4));
 }
 
@@ -91,19 +95,25 @@ void Reset_Colors(config_type config, char *string){
     Default_Colors(config, string);
 }
 
-void Header_Colors(config_type config, char *string){
+void Border_Colors(config_type config, char *string){
+    char buffer[20] = "";
+    sprintf(buffer, "\e[%dm", config->text_border_color);
+    strcat(string, buffer);
+}
+
+void Header_Text_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->background_header_color, config->text_header_color);
     strcat(string, buffer);
 }
 
-void Odd_Line_Colors(config_type config, char *string){
+void Odd_Text_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->odd_background_line_color, config->odd_text_line_color);
     strcat(string, buffer);
 }
 
-void Even_Line_Colors(config_type config, char *string){
+void Even_Text_Colors(config_type config, char *string){
     char buffer[20] = "";
     sprintf(buffer, "\e[%d;%dm", config->even_background_line_color, config->even_text_line_color);
     strcat(string, buffer);

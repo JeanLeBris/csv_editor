@@ -7,6 +7,7 @@ typedef struct config_type{
 
     int default_background_color;
     int default_text_color;
+    int text_border_color;
     int background_header_color;
     int text_header_color;
     int odd_background_line_color;

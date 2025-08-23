@@ -250,7 +250,7 @@ void Print_Table(table_type table_object, config_type config, int state){
     Scrollback_To_Screen_Start();
     #endif
     #ifdef _WIN64
-    output = (char*)malloc(config->window_length * config->window_width * 2 * sizeof(char));
+    output = (char*)malloc(config->window_length * config->window_width * 10 * sizeof(char));
     strcpy(output, "\0");
     #endif
     Hide_Cursor(output);
@@ -381,7 +381,9 @@ void Print_Table(table_type table_object, config_type config, int state){
     // Write table border
     width_counter = 0;
     if(table_object->table_width > 0){
-        Default_Colors(config, output);
+        // Default_Colors(config, output);
+        Header_Text_Colors(config, output);
+        Border_Colors(config, output);
         add_to_display_buffer("+", output);
         width_counter++;
     }
@@ -402,7 +404,9 @@ void Print_Table(table_type table_object, config_type config, int state){
                     width_counter++;
                 }
             }
-            Default_Colors(config, output);
+            // Default_Colors(config, output);
+            Header_Text_Colors(config, output);
+            Border_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
@@ -423,6 +427,7 @@ void Print_Table(table_type table_object, config_type config, int state){
             width_counter++;
         }
     }
+    Default_Colors(config, output);
     while(width_counter < config->window_width){
         add_to_display_buffer(" ", output);
         width_counter++;
@@ -434,9 +439,14 @@ void Print_Table(table_type table_object, config_type config, int state){
             Selection_Content_Colors(config, output);
         }
         else{
-            Default_Colors(config, output);
+            // Default_Colors(config, output);
+            Header_Text_Colors(config, output);
+            Border_Colors(config, output);
         }
         add_to_display_buffer("|", output);
+        if(!(table_object->active_line == -1 && table_object->active_column == -1)){                // To fix
+            Header_Text_Colors(config, output);
+        }
         width_counter++;
     }
     for(int i = table_object->first_column_printed; i < table_object->table_width; i++){
@@ -465,14 +475,16 @@ void Print_Table(table_type table_object, config_type config, int state){
                     }
                     add_to_display_buffer(char_buffer, output);
                     if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                        Default_Colors(config, output);
+                        // Default_Colors(config, output);
+                        Header_Text_Colors(config, output);
                     }
                     width_counter++;
                 }
                 if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
                     Selection_Content_Colors(config, output);
                     add_to_display_buffer(" ", output);
-                    Default_Colors(config, output);
+                    // Default_Colors(config, output);
+                    Header_Text_Colors(config, output);
                     width_counter++;
                 }
             }
@@ -497,7 +509,8 @@ void Print_Table(table_type table_object, config_type config, int state){
                             }
                             add_to_display_buffer(char_buffer, output);
                             if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                                Default_Colors(config, output);
+                                // Default_Colors(config, output);
+                                Header_Text_Colors(config, output);
                             }
                             // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
                             width_counter++;
@@ -527,7 +540,8 @@ void Print_Table(table_type table_object, config_type config, int state){
                         }
                         add_to_display_buffer(char_buffer, output);
                         if(table_object->active_line == -1 && j == table_object->character_highlighted){
-                            Default_Colors(config, output);
+                            // Default_Colors(config, output);
+                            Header_Text_Colors(config, output);
                         }
                         width_counter++;
                     }
@@ -535,7 +549,8 @@ void Print_Table(table_type table_object, config_type config, int state){
                 if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
                     Selection_Content_Colors(config, output);
                     add_to_display_buffer(" ", output);
-                    Default_Colors(config, output);
+                    // Default_Colors(config, output);
+                    Header_Text_Colors(config, output);
                     // The following code is made so that the columns stay aligned well,
                     // otherwise the following lines end up misaligned one character on the left or one character on the right.
                     // It is probably due to a missing or one too much increment to the width_counter variable somewhere in the code.
@@ -547,7 +562,8 @@ void Print_Table(table_type table_object, config_type config, int state){
                     }
                 }
             }
-            Default_Colors(config, output);
+            // Default_Colors(config, output);
+            Header_Text_Colors(config, output);
         }
         else{   // if header not in active column
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
@@ -588,13 +604,21 @@ void Print_Table(table_type table_object, config_type config, int state){
             }
         }
         if(width_counter < config->window_width){
+            if(!(table_object->active_line == -1 && table_object->active_column == -1)){                // To fix
+                Header_Text_Colors(config, output);
+                Border_Colors(config, output);
+            }
             add_to_display_buffer("|", output);
+            if(!(table_object->active_line == -1 && table_object->active_column == -1)){                // To fix
+                Header_Text_Colors(config, output);
+            }
             width_counter++;
         }
     }
-    if(table_object->active_line == -1 && table_object->active_column == -1){
-        Default_Colors(config, output);
-    }
+    // if(table_object->active_line == -1 && table_object->active_column == -1){
+    //     Default_Colors(config, output);
+    // }
+    Default_Colors(config, output);
     while(width_counter < config->window_width){
         add_to_display_buffer(" ", output);
         width_counter++;
@@ -602,7 +626,9 @@ void Print_Table(table_type table_object, config_type config, int state){
     // Write table border
     width_counter = 0;
     if(table_object->table_width > 0){
-        Default_Colors(config, output);
+        // Default_Colors(config, output);
+        Header_Text_Colors(config, output);
+        Border_Colors(config, output);
         add_to_display_buffer("+", output);
         width_counter++;
     }
@@ -623,7 +649,9 @@ void Print_Table(table_type table_object, config_type config, int state){
                     width_counter++;
                 }
             }
-            Default_Colors(config, output);
+            // Default_Colors(config, output);
+            Header_Text_Colors(config, output);
+            Border_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
@@ -644,6 +672,7 @@ void Print_Table(table_type table_object, config_type config, int state){
             width_counter++;
         }
     }
+    Default_Colors(config, output);
     while(width_counter < config->window_width){
         add_to_display_buffer(" ", output);
         width_counter++;
@@ -654,16 +683,27 @@ void Print_Table(table_type table_object, config_type config, int state){
     // Print body content
     for(int i = table_object->first_line_printed; i < table_object->table_length && (i - table_object->first_line_printed) < max_lines_to_print; i++){
         width_counter = 0;
-        if((i + 1)%2 == 0){
-            Even_Line_Colors(config, output);
-        }
-        else{
-            Odd_Line_Colors(config, output);
-        }
         if(i == table_object->active_line && table_object->active_column == -1){
             Selection_Content_Colors(config, output);
         }
+        else{
+            if((i + 1)%2 == 0){
+                Even_Text_Colors(config, output);
+            }
+            else{
+                Odd_Text_Colors(config, output);
+            }
+            Border_Colors(config, output);
+        }
         add_to_display_buffer("|", output);
+        if(!(i == table_object->active_line && table_object->active_column == -1)){
+            if((i + 1)%2 == 0){
+                Even_Text_Colors(config, output);
+            }
+            else{
+                Odd_Text_Colors(config, output);
+            }
+        }
         width_counter++;
         for(int j = table_object->first_column_printed; j < table_object->table_width; j++){
             if(j == table_object->active_column){   // if cell in active column
@@ -690,10 +730,10 @@ void Print_Table(table_type table_object, config_type config, int state){
                         add_to_display_buffer(char_buffer, output);
                         if(table_object->active_line == i && k == table_object->character_highlighted){
                             if((i + 1)%2 == 0){
-                                Even_Line_Colors(config, output);
+                                Even_Text_Colors(config, output);
                             }
                             else{
-                                Odd_Line_Colors(config, output);
+                                Odd_Text_Colors(config, output);
                             }
                         }
                         width_counter++;
@@ -701,7 +741,12 @@ void Print_Table(table_type table_object, config_type config, int state){
                     if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
                         Selection_Content_Colors(config, output);
                         add_to_display_buffer(" ", output);
-                        Default_Colors(config, output);
+                        if((i + 1)%2 == 0){
+                            Even_Text_Colors(config, output);
+                        }
+                        else{
+                            Odd_Text_Colors(config, output);
+                        }
                         width_counter++;
                     }
                 }
@@ -726,10 +771,10 @@ void Print_Table(table_type table_object, config_type config, int state){
                                 add_to_display_buffer(char_buffer, output);
                                 if(table_object->active_line == i && k == table_object->character_highlighted){
                                     if((i + 1)%2 == 0){
-                                        Even_Line_Colors(config, output);
+                                        Even_Text_Colors(config, output);
                                     }
                                     else{
-                                        Odd_Line_Colors(config, output);
+                                        Odd_Text_Colors(config, output);
                                     }
                                 }
                                 // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
@@ -755,10 +800,10 @@ void Print_Table(table_type table_object, config_type config, int state){
                             add_to_display_buffer(char_buffer, output);
                             if(table_object->active_line == i && k == table_object->character_highlighted){
                                 if((i + 1)%2 == 0){
-                                    Even_Line_Colors(config, output);
+                                    Even_Text_Colors(config, output);
                                 }
                                 else{
-                                    Odd_Line_Colors(config, output);
+                                    Odd_Text_Colors(config, output);
                                 }
                             }
                             width_counter++;
@@ -767,7 +812,13 @@ void Print_Table(table_type table_object, config_type config, int state){
                     if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
                         Selection_Content_Colors(config, output);
                         add_to_display_buffer(" ", output);
-                        Default_Colors(config, output);
+                        // Default_Colors(config, output);
+                        if((i + 1)%2 == 0){
+                            Even_Text_Colors(config, output);
+                        }
+                        else{
+                            Odd_Text_Colors(config, output);
+                        }
                         // The following code is made so that the columns stay aligned well,
                         // otherwise the following lines end up misaligned one character on the left or one character on the right.
                         // It is probably due to a missing or one too much increment to the width_counter variable somewhere in the code.
@@ -781,10 +832,10 @@ void Print_Table(table_type table_object, config_type config, int state){
                 }
                 // Default_Colors(config);
                 if((i + 1)%2 == 0){
-                    Even_Line_Colors(config, output);
+                    Even_Text_Colors(config, output);
                 }
                 else{
-                    Odd_Line_Colors(config, output);
+                    Odd_Text_Colors(config, output);
                 }
             }
             else{   // if cell not in active column
@@ -826,7 +877,27 @@ void Print_Table(table_type table_object, config_type config, int state){
                 }
             }
             if(width_counter < config->window_width){
+                if(i == table_object->active_line && table_object->active_column == -1){
+                    Selection_Content_Colors(config, output);
+                }
+                else{
+                    if((i + 1)%2 == 0){
+                        Even_Text_Colors(config, output);
+                    }
+                    else{
+                        Odd_Text_Colors(config, output);
+                    }
+                    Border_Colors(config, output);
+                }
                 add_to_display_buffer("|", output);
+                if(!(i == table_object->active_line && table_object->active_column == -1)){
+                    if((i + 1)%2 == 0){
+                        Even_Text_Colors(config, output);
+                    }
+                    else{
+                        Odd_Text_Colors(config, output);
+                    }
+                }
                 width_counter++;
             }
         }
@@ -845,7 +916,9 @@ void Print_Table(table_type table_object, config_type config, int state){
     // Write table border
     width_counter = 0;
     if(table_object->table_width > 0){
-        Default_Colors(config, output);
+        // Default_Colors(config, output);
+        Odd_Text_Colors(config, output);
+        Border_Colors(config, output);
         add_to_display_buffer("+", output);
         width_counter++;
     }
@@ -866,7 +939,9 @@ void Print_Table(table_type table_object, config_type config, int state){
                     width_counter++;
                 }
             }
-            Default_Colors(config, output);
+            // Default_Colors(config, output);
+            Odd_Text_Colors(config, output);
+            Border_Colors(config, output);
         }
         else{
             if(table_object->cell_width[table_object->columns_order_of_display[i]] < config->unfocused_cell_max_width){
@@ -887,6 +962,7 @@ void Print_Table(table_type table_object, config_type config, int state){
             width_counter++;
         }
     }
+    Default_Colors(config, output);
     while(width_counter < config->window_width){
         add_to_display_buffer(" ", output);
         width_counter++;
@@ -981,6 +1057,7 @@ void Print_Table(table_type table_object, config_type config, int state){
     #endif
     display(output);
     #ifdef _WIN64
+    printf("\e[0m");
     free(output);
     #endif
 }

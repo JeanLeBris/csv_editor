@@ -29,6 +29,7 @@ void Set_Default_Config(config_type config, char *exe_path){
 
     config->default_background_color = 40;
     config->default_text_color = 37;
+    config->text_border_color = 37;
     config->background_header_color = 40;
     config->text_header_color = 37;
     config->odd_background_line_color = 40;
@@ -89,6 +90,11 @@ void Load_Config(config_type config){
         else if(strcmp(fragmented_line, "default_text_color") == 0){
             // strcpy(config->default_text_color, strtok(NULL, seps));
             config->default_text_color = atoi(strtok(NULL, seps));
+            // printf("%s\n", config->default_text_color);
+        }
+        else if(strcmp(fragmented_line, "text_border_color") == 0){
+            // strcpy(config->default_text_color, strtok(NULL, seps));
+            config->text_border_color = atoi(strtok(NULL, seps));
             // printf("%s\n", config->default_text_color);
         }
         else if(strcmp(fragmented_line, "background_header_color") == 0){
@@ -259,6 +265,7 @@ void Print_Config(config_type config){
     no_output_string_display("Colors :\n");
     no_output_string_display("\tDefault background color : %d\n", config->default_background_color);
     no_output_string_display("\tDefault text color : %d\n", config->default_text_color);
+    no_output_string_display("\tText border color : %d\n", config->text_border_color);
     no_output_string_display("\tBackground header color : %d\n", config->background_header_color);
     no_output_string_display("\tText header color : %d\n", config->text_header_color);
     no_output_string_display("\tOdd background line color : %d\n", config->odd_background_line_color);
