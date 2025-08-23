@@ -29,6 +29,7 @@ void Set_Default_Config(config_type config, char *exe_path){
 
     config->default_background_color = 40;
     config->default_text_color = 37;
+    config->text_border_color = 37;
     config->background_header_color = 40;
     config->text_header_color = 37;
     config->odd_background_line_color = 40;
@@ -40,12 +41,13 @@ void Set_Default_Config(config_type config, char *exe_path){
 
     #ifdef __linux__
     init_pair(1, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, config->default_background_color / 10 < 5 ? config->default_background_color%10 : 8 + config->default_background_color%10);
-    init_pair(2, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
-    init_pair(3, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
-    init_pair(4, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
-    init_pair(5, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
+    init_pair(2, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, 0);
+    init_pair(3, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
+    init_pair(4, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
+    init_pair(5, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
+    init_pair(6, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
     #endif
-
+    
     config->table_type = 0; // static
     config->file_line_max_length = 1000;
     config->file_max_length = 1000;
@@ -89,6 +91,11 @@ void Load_Config(config_type config){
         else if(strcmp(fragmented_line, "default_text_color") == 0){
             // strcpy(config->default_text_color, strtok(NULL, seps));
             config->default_text_color = atoi(strtok(NULL, seps));
+            // printf("%s\n", config->default_text_color);
+        }
+        else if(strcmp(fragmented_line, "text_border_color") == 0){
+            // strcpy(config->default_text_color, strtok(NULL, seps));
+            config->text_border_color = atoi(strtok(NULL, seps));
             // printf("%s\n", config->default_text_color);
         }
         else if(strcmp(fragmented_line, "background_header_color") == 0){
@@ -181,10 +188,11 @@ void Load_Config(config_type config){
 
     #ifdef __linux__
     init_pair(1, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, config->default_background_color / 10 < 5 ? config->default_background_color%10 : 8 + config->default_background_color%10);
-    init_pair(2, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
-    init_pair(3, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
-    init_pair(4, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
-    init_pair(5, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
+    init_pair(2, config->default_text_color / 10 < 4 ? config->default_text_color%10 : 8 + config->default_text_color%10, 0);
+    init_pair(3, config->text_header_color / 10 < 4 ? config->text_header_color%10 : 8 + config->text_header_color%10, config->background_header_color / 10 < 5 ? config->background_header_color%10 : 8 + config->background_header_color%10);
+    init_pair(4, config->odd_text_line_color / 10 < 4 ? config->odd_text_line_color%10 : 8 + config->odd_text_line_color%10, config->odd_background_line_color / 10 < 5 ? config->odd_background_line_color%10 : 8 + config->odd_background_line_color%10);
+    init_pair(5, config->even_text_line_color / 10 < 4 ? config->even_text_line_color%10 : 8 + config->even_text_line_color%10, config->even_background_line_color / 10 < 5 ? config->even_background_line_color%10 : 8 + config->even_background_line_color%10);
+    init_pair(6, config->selection_text_color / 10 < 4 ? config->selection_text_color%10 : 8 + config->selection_text_color%10, config->selection_background_color / 10 < 5 ? config->selection_background_color%10 : 8 + config->selection_background_color%10);
     #endif
 
     fclose(f);
@@ -259,6 +267,7 @@ void Print_Config(config_type config){
     no_output_string_display("Colors :\n");
     no_output_string_display("\tDefault background color : %d\n", config->default_background_color);
     no_output_string_display("\tDefault text color : %d\n", config->default_text_color);
+    no_output_string_display("\tText border color : %d\n", config->text_border_color);
     no_output_string_display("\tBackground header color : %d\n", config->background_header_color);
     no_output_string_display("\tText header color : %d\n", config->text_header_color);
     no_output_string_display("\tOdd background line color : %d\n", config->odd_background_line_color);

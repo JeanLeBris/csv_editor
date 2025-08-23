@@ -121,6 +121,8 @@ Color codes :
 
 ```default_text_color = 37``` : Sets the default color of the text.
 
+```text_border_color = 37``` : Sets the color of the table border.
+
 ```background_header_color = 40``` : Sets the default color of the background of the header.
 
 ```text_header_color = 34``` : Sets the default color of the text of the background.
@@ -136,5 +138,9 @@ Color codes :
 ```selection_background_color = 47``` : Sets the background color in selection areas.
 
 ```selection_text_color = 30``` : Sets the text color in selection areas.
+
+> [!NOTE]
+> The color customization does not work for the ```text_border_color``` setting on Linux, only use it on Windows.\
+> On linux, the color of the border of the table will be based on the line's text color, whether the header, even or odd text color.
 
 ## In the program

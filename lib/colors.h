@@ -10,9 +10,10 @@ void display(const char *string);
 
 void Default_Colors(config_type config, char *string);
 void Reset_Colors(config_type config, char *string);
-void Header_Colors(config_type config, char *string);
-void Odd_Line_Colors(config_type config, char *string);
-void Even_Line_Colors(config_type config, char *string);
+void Border_Colors(config_type config, char *string);
+void Header_Text_Colors(config_type config, char *string);
+void Odd_Text_Colors(config_type config, char *string);
+void Even_Text_Colors(config_type config, char *string);
 void Selection_Content_Colors(config_type config, char *string);
 
 void Hide_Cursor(char *string);
