@@ -359,5 +359,10 @@ int main(int argc, char **argv){
     #ifdef __linux__
     endwin();
     #endif
+    #ifdef _WIN64
+    char reset_cursor_string[10] = "";
+    Show_Cursor(reset_cursor_string);
+    printf("%s", reset_cursor_string);
+    #endif
     return 0;
 }
