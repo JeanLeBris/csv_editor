@@ -182,7 +182,7 @@ int main(int argc, char **argv){
                             state = REGULAR_STATE;
                             refresh_screen_bool = 1;
                         }
-                        else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 127){    // backspace
+                        else if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 127 || stdin_buffer[0] == 8)){    // backspace
                             refresh_screen_bool = on_command_backspace(table_object);
                         }
                         else{
@@ -210,7 +210,7 @@ int main(int argc, char **argv){
                                 refresh_screen_bool = on_edit_go_right(table_object);
                             }
                         }
-                        else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 127){    // backspace
+                        else if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 127 || stdin_buffer[0] == 8)){    // backspace
                             refresh_screen_bool = on_edit_backspace(table_object);
                         }
                         else{
