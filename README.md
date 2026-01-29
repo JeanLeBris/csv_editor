@@ -144,3 +144,58 @@ Color codes :
 > On linux, the color of the border of the table will be based on the line's text color, whether the header, even or odd text color.
 
 ## In the program
+
+There are X modes the application can work on:
+- the `SELECTION` mode.
+- the `COMMAND` mode.
+- the `INSERT` mode.
+- the `MOVE` mode.
+
+### The SELECTION mode
+
+When running the application, it will load on `SELECTION` mode, it allows you to look through the table by using the arrow keys.
+
+If you go over the row of index -2 (no rows selected) and if you go left and right with the arrow keys, the cursor will select entire columns.
+
+If you go over the column of index -1 (no columns selected) and if you go up and down with the arrow keys, the cursor will select entire rows.
+
+### The COMMAND mode
+
+If you are on the `SELECTION` or the `MOVE` mode and type the Esc key, you will enter the `COMMAND` mode, allowing you to enter commands.
+
+If you want to quit without saving, you can use the `:q` command.
+
+If you want to save and quit, you can use the `:wq` command.
+
+If you want to move around faster, you can use the `:jump` command and go to the nth row using the following format :
+```
+:jump n
+```
+
+If you want to insert a new column on the right of the one you are currently on, you can use the following command :
+```
+:new column
+```
+
+If you want to insert a new line below the one you are currently on, you can use the following command :
+```
+:new line
+```
+
+### The INSERT mode
+
+If you are on the `SELECTION` mode, go over a cell and type the 'i' key, the application will enter the `INSERT` mode on this cell, allowing you to modify its content.
+
+On this mode, you can move your cursor's position left and right to insert or remove text where you want.
+
+When you want to go back to `SELECTION` mode, you can then type the Enter key or the Esc key.
+
+### The MOVE mode
+
+If you are on the `SELECTION` mode, go over a cell, a row or a column (you cannot move a header cell, except if you select its whole column) and type the 'm' key, the application will enter the `MOVE` mode on this cell, row or column and allow you to move it to a new location in the table.
+
+If you have selected a cell, you will be able to move it up, down, left or right by using the arrow keys.
+
+If you have selected a row, you will be able to move it up and down and if you have selected a column you will be able to move it left and right.
+
+To put down the selected element, you can type the 'm' key to return to the `SELECTION` mode or you can type the Esc key to go back to the `COMMAND` mode.
