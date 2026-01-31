@@ -71,7 +71,7 @@ void Load_Config(config_type config){
     char line[101] = "";
     char *fragmented_line = NULL;
     char seps[] = " \n=\"";
-    strcat(strcat(config_file_path, config->installation_directory), "./csv_editor.conf");
+    strcat(strcat(config_file_path, config->installation_directory), "../csv_editor.conf"); // Move back by one to look for the config file in the project's root instead of the ./bin/ folder
     FILE *f = fopen(config_file_path, "r");
     if(f == NULL){
         printf("file error\n");
