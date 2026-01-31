@@ -1008,9 +1008,11 @@ void Print_Table(table_type table_object, config_type config, int state){
     width_counter = 0;
     int digit_count_length = table_object->table_length > 9 ? (int) floor(log10(table_object->table_length)) + 1 : 2;
     int digit_count_width = table_object->table_width > 9 ? (int) floor(log10(table_object->table_width)) + 1 : 2;
+    int digit_count_character = config->cell_max_width > 9 ? (int) floor(log10(config->cell_max_width)) + 1 : 2;
     int digit_active_line = table_object->active_line > 0 ? (int) floor(log10(table_object->active_line)) + 1 : (table_object->active_line < 0 ? 2 : 1);
     int digit_active_column = table_object->active_column > 0 ? (int) floor(log10(table_object->active_column)) + 1 : (table_object->active_column < 0 ? 2 : 1);
-    int in_table_coord_size = digit_count_length + digit_count_width + 1;
+    int digit_active_character = table_object->character_highlighted > 0 ? (int) floor(log10(table_object->character_highlighted)) + 1 : (table_object->character_highlighted < 0 ? 2 : 1);
+    int in_table_coord_size = digit_count_length + digit_count_width + digit_count_character + 2;
     int max_command_display_size = config->window_width - in_table_coord_size;
     for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
         if(i == table_object->command_character_highlighted){
@@ -1070,6 +1072,13 @@ void Print_Table(table_type table_object, config_type config, int state){
     sprintf(char_buffer, "%d", table_object->active_column);
     add_to_display_buffer(char_buffer, output);
     for(int i = 0; i < digit_count_width - digit_active_column; i++){
+        add_to_display_buffer(" ", output);
+    }
+    add_to_display_buffer(",", output);
+    // itoa(table_object->active_column, char_buffer, 10);
+    sprintf(char_buffer, "%d", table_object->character_highlighted);
+    add_to_display_buffer(char_buffer, output);
+    for(int i = 0; i < digit_count_character - digit_active_character; i++){
         add_to_display_buffer(" ", output);
     }
     
