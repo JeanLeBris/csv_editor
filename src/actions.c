@@ -503,10 +503,15 @@ int on_edit_characters(table_type table_object, int cell_max_width, char c){
         // If there is still space left in the string (to verify)
         if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < cell_max_width){
             strcpy(buffer_string, table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
-            for(int i = strlen(buffer_string); i >= table_object->character_highlighted; i--){
-                buffer_string[i + 1] = buffer_string[i];
+            if(table_object->type[table_object->columns_order_of_display[table_object->active_column]] == COLUMN_TYPE_DATE){
+                buffer_string[table_object->character_highlighted] = c;
             }
-            buffer_string[table_object->character_highlighted] = c;
+            else{
+                for(int i = strlen(buffer_string); i >= table_object->character_highlighted; i--){
+                    buffer_string[i + 1] = buffer_string[i];
+                }
+                buffer_string[table_object->character_highlighted] = c;
+            }
             switch(table_object->type[table_object->columns_order_of_display[table_object->active_column]]){
                 case COLUMN_TYPE_STRING:
                     is_input_ok = 1;
