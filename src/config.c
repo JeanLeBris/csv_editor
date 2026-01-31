@@ -18,9 +18,14 @@ void Set_Default_Config(config_type config, char *exe_path){
     // int memstr_size = GetModuleFileNameA(NULL, memstr, 100);
     // strncpy(config->installation_directory, memstr, memstr_size - 14);
     #ifdef __linux__
-    getcwd(config->installation_directory, 100);    // only works if in the program's directory
-    config->installation_directory[strlen(config->installation_directory) + 1] = '\0';
-    config->installation_directory[strlen(config->installation_directory)] = '/';
+    // getcwd(config->installation_directory, 100);    // only works if in the program's directory
+    // config->installation_directory[strlen(config->installation_directory) + 1] = '\0';
+    // config->installation_directory[strlen(config->installation_directory)] = '/';
+
+    int length = readlink("/proc/self/exe", config->installation_directory, 98);
+    // config->installation_directory[length] = '/';
+    // config->installation_directory[length + 1] = '\0';
+    config->installation_directory[length - 10] = '\0';
     #endif
     #ifdef _WIN64
     strncpy(config->installation_directory, exe_path, strlen(exe_path) - 14);
