@@ -4,6 +4,7 @@
 
 #include "../lib/actions.h"
 #include "../lib/constants.h"
+#include "../lib/utils.h"
 
 void set_character_highlighted_to_last_character(table_type table_object){
     if(table_object->active_line == -1){
@@ -475,7 +476,9 @@ int on_edit_characters(table_type table_object, int cell_max_width, char c){
                     is_input_ok = 1;
                     break;
                 case COLUMN_TYPE_DATE:
-                    is_input_ok = 1;
+                    if(Is_Date(buffer_string, strlen(buffer_string))){
+                        is_input_ok = 1;
+                    }
                     break;
                 case COLUMN_TYPE_DECIMAL:
                     if(Is_Decimal(buffer_string, strlen(buffer_string))){

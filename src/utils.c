@@ -43,6 +43,33 @@ int Is_Decimal(char *value, int size){
     return 1;
 }
 
+/**
+ * Check if the inputed value is a date
+ * 
+ * The only accepted format right now is `YYYY-MM-DD hh:mm:ss`
+ */
 int Is_Date(char *value, int size){
-
+    for(int i = 0; i < size; i++){
+        if(i == 4 || i == 7){
+            if(value[i] != '-')
+                return 0;
+        }
+        else if(i == 10){
+            if(value[i] != ' ')
+                return 0;
+        }
+        else if(i == 13 || i == 16){
+            if(value[i] != ':')
+                return 0;
+        }
+        else if(i == 19){
+            if(value[i] != '\0')
+                return 0;
+        }
+        else{
+            if(value[i] < 0x30 || value[i] > 0x39)
+                return 0;
+        }
+    }
+    return 1;
 }

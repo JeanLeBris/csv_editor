@@ -53,16 +53,27 @@ void Update_Column_Type_By_Cell_Value(int *column_type, char* cell_value, int si
         case COLUMN_TYPE_STRING:
             break;
         case COLUMN_TYPE_DATE:
+            if(!Is_Date(cell_value, size)){
+                *column_type = COLUMN_TYPE_STRING;
+            }
             break;
         case COLUMN_TYPE_DECIMAL:
             if(!Is_Decimal(cell_value, size)){
-                *column_type = COLUMN_TYPE_STRING;
+                if(!Is_Date(cell_value, size)){
+                    *column_type = COLUMN_TYPE_STRING;
+                }
+                else
+                    *column_type = COLUMN_TYPE_DATE;
             }
             break;
         case COLUMN_TYPE_INTEGER:
             if(!Is_Integer(cell_value, size)){
                 if(!Is_Decimal(cell_value, size)){
-                    *column_type = COLUMN_TYPE_STRING;
+                    if(!Is_Date(cell_value, size)){
+                        *column_type = COLUMN_TYPE_STRING;
+                    }
+                    else
+                        *column_type = COLUMN_TYPE_DATE;
                 }
                 else
                     *column_type = COLUMN_TYPE_DECIMAL;
