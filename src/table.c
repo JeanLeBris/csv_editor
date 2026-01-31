@@ -11,6 +11,7 @@
 #endif
 #include "../lib/table.h"
 #include "../lib/constants.h"
+#include "../lib/utils.h"
 
 void Get_File_Characteristics(table_type table_object, config_type config){
     FILE *f = fopen(config->input_file, "r");
@@ -47,6 +48,33 @@ void Get_File_Characteristics(table_type table_object, config_type config){
     return;
 }
 
+void Update_Column_Type_By_Cell_Value(int *column_type, char* cell_value, int size){
+    switch(*column_type){
+        case COLUMN_TYPE_STRING:
+            break;
+        case COLUMN_TYPE_DATE:
+            break;
+        case COLUMN_TYPE_DECIMAL:
+            if(!Is_Decimal(cell_value, size)){
+                *column_type = COLUMN_TYPE_STRING;
+            }
+            break;
+        case COLUMN_TYPE_INTEGER:
+            if(!Is_Integer(cell_value, size)){
+                if(!Is_Decimal(cell_value, size)){
+                    *column_type = COLUMN_TYPE_STRING;
+                }
+                else
+                    *column_type = COLUMN_TYPE_DECIMAL;
+            }
+            break;
+        default:
+            break;
+    }
+    // printf("%d\n", *column_type);
+    return;
+}
+
 void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_in_file, int end_in_file, int start_to_replace, int memory_to_replace){
     // char sep = ';'; // Follows the RFC 4180, to change later to accept other separators
     Get_File_Characteristics(table_object, config);
@@ -69,9 +97,11 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
             // printf(line);
             if(i == 0){ // if in header
                 table_object->header = malloc(table_object->table_width * sizeof(*table_object->header));
+                table_object->type = malloc(table_object->table_width * sizeof(int));
                 for(int j = 0; j < table_object->table_width; j++){
                     table_object->header[j] = malloc((config->cell_max_width + 1) * sizeof(char));
                     table_object->header[j][0] = '\0';
+                    table_object->type[j] = COLUMN_TYPE_INTEGER;
                 }
                 table_object->columns_order_of_display = malloc(table_object->table_width * sizeof(int));
                 for(int j = 0; j < table_object->table_width; j++){
@@ -161,11 +191,12 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 col_num = 0;
                 in_cell_iterator = 0;
                 for(int j = 0; j < strlen(line) + 1; j++){  // +1 to be sure of getting a '\0' character
-                    if(in_quotes != 1 && line[j] == config->input_separator){
+                    if(in_quotes != 1 && line[j] == config->input_separator){   // End of cell
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
                         // printf("%s\n", table_object->table[line_num][col_num]);
+                        Update_Column_Type_By_Cell_Value(&table_object->type[col_num], table_object->table[line_num][col_num], in_cell_iterator);
                         col_num++;
                         in_cell_iterator = 0;
                         in_quotes = 0;
@@ -177,13 +208,13 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                         // printf("%s\n", table_object->table[line_num][col_num]);
                         in_quotes = 0;
                     }
-                    else if(in_quotes == 0 && line[j] == '\"'){
+                    else if(in_quotes == 0 && line[j] == '\"'){ // Start of a quote
                         in_quotes++;
                     }
-                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){  // End of a quote
                         in_quotes++;
                     }
-                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){  // Inline quote (quote to keep in the display)
                         if(in_cell_iterator < config->cell_max_width){
                             table_object->table[line_num][col_num][in_cell_iterator] = line[j];
                             in_cell_iterator++;
@@ -1060,6 +1091,12 @@ void Print_Table(table_type table_object, config_type config, int state){
     printf("\e[0m");
     free(output);
     #endif
+
+    // FILE* debug_type_file = fopen("./col_types.txt", "w");
+    // for(int i = 0; i < table_object->table_width; i++){
+    //     fprintf(debug_type_file, "%d\n", table_object->type[i]);
+    // }
+    // fclose(debug_type_file);
 }
 
 void Save_Table(table_type table_object, config_type config){
@@ -1115,6 +1152,7 @@ table_type Free_Table_Object(table_type table_object, config_type config){
         free(table_object->header[j]);
     }
     free(table_object->header);
+    free(table_object->type);
     
     free(table_object->columns_order_of_display);
     

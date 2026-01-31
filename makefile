@@ -3,7 +3,7 @@ export CC=gcc
 export CFLAGS= -Wall
 export LDFLAGS= -Wall
 export EXEC=csv_editor
-SRCNAMES= main.c table.c actions.c colors.c config.c
+SRCNAMES= main.c table.c actions.c colors.c config.c utils.c
 export SRCDIR=src
 SRC= $(foreach srcname, $(SRCNAMES), $(SRCDIR)/$(srcname))
 OBJNAMES= $(SRCNAMES:.c=.o)
