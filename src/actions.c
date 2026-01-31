@@ -408,8 +408,12 @@ int on_edit_go_right(table_type table_object){
     return 0;
 }
 
-int on_edit_backspace(table_type table_object){
+int on_edit_backspace(table_type table_object, int cell_max_width){
+    int is_input_ok = 0;
+    char *buffer_string = malloc((cell_max_width + 1) * sizeof(char));
+    // If in header
     if(table_object->active_column > -1 && table_object->active_line == -1){
+        // If you can delete content
         if(table_object->character_highlighted > 0){
             for(int i = table_object->character_highlighted - 1; i < strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]); i++){
                 table_object->header[table_object->columns_order_of_display[table_object->active_column]][i] = table_object->header[table_object->columns_order_of_display[table_object->active_column]][i + 1];
@@ -420,26 +424,58 @@ int on_edit_backspace(table_type table_object){
             else if(strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
                 Update_Cell_Width_By_Column(table_object, table_object->active_column);
             }
-            table_object->character_highlighted--;
-            return 1;
+            is_input_ok = 1;
         }
     }
+    // If in body
     else if(table_object->active_column > -1 && table_object->active_line > -1){
+        // If you can delete content
         if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > 0){
-            for(int i = table_object->character_highlighted - 1; i < strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]); i++){
-                table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i] = table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][i + 1];
+            strcpy(buffer_string, table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+            for(int i = table_object->character_highlighted - 1; i < strlen(buffer_string); i++){
+                buffer_string[i] = buffer_string[i + 1];
             }
-            if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
-                table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+            switch(table_object->type[table_object->columns_order_of_display[table_object->active_column]]){
+                case COLUMN_TYPE_STRING:
+                    is_input_ok = 1;
+                    break;
+                case COLUMN_TYPE_DATE:
+                    if(Is_Date(buffer_string, strlen(buffer_string))){
+                        is_input_ok = 1;
+                    }
+                    break;
+                case COLUMN_TYPE_DECIMAL:
+                    if(Is_Decimal(buffer_string, strlen(buffer_string))){
+                        is_input_ok = 1;
+                    }
+                    break;
+                case COLUMN_TYPE_INTEGER:
+                    if(Is_Integer(buffer_string, strlen(buffer_string))){
+                        is_input_ok = 1;
+                    }
+                    break;
+                default:
+                    break;
             }
-            else if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
-                Update_Cell_Width_By_Column(table_object, table_object->active_column);
+            if(is_input_ok){
+                strcpy(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]], buffer_string);
+                if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) > table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                    table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]] = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
+                }
+                else if(strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]) < table_object->cell_width[table_object->columns_order_of_display[table_object->active_column]]){
+                    Update_Cell_Width_By_Column(table_object, table_object->active_column);
+                }
             }
-            table_object->character_highlighted--;
-            return 1;
         }
     }
-    return 0;
+    
+    free(buffer_string);
+    if(is_input_ok){
+        table_object->character_highlighted--;
+        return 1;
+    }
+    else
+        return 0;
 }
 
 int on_edit_characters(table_type table_object, int cell_max_width, char c){

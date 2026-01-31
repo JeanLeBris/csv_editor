@@ -211,7 +211,7 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 127){    // backspace
-                            refresh_screen_bool = on_edit_backspace(table_object);
+                            refresh_screen_bool = on_edit_backspace(table_object, config->cell_max_width);
                         }
                         else{
                             refresh_screen_bool = on_edit_characters(table_object, config->cell_max_width, stdin_buffer[0]);
@@ -334,7 +334,7 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(c == 8){    // backspace
-                            refresh_screen_bool = on_edit_backspace(table_object);
+                            refresh_screen_bool = on_edit_backspace(table_object, config->cell_max_width);
                         }
                         else{   // other characters
                             refresh_screen_bool = on_edit_characters(table_object, config->cell_max_width, c);

@@ -31,7 +31,7 @@ int on_command_characters(table_type table_object, int command_string_size, char
 
 int on_edit_go_left(table_type table_object);
 int on_edit_go_right(table_type table_object);
-int on_edit_backspace(table_type table_object);
+int on_edit_backspace(table_type table_object, int cell_max_width);
 int on_edit_characters(table_type table_object, int cell_max_width, char c);
 
 #endif
