@@ -108,16 +108,19 @@ int main(int argc, char **argv){
                     if(state == REGULAR_STATE){
                         if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 'm'){
                             state = MOVE_STATE;
+                            Update_Display_Text(display_text, "-- MOVE --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 'i' && table_object->active_column > -1 && table_object->active_line > -2){
                             set_character_highlighted_to_last_character(table_object);
                             state = EDIT_STATE;
+                            Update_Display_Text(display_text, "-- INSERT --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 27){
                             state = COMMAND_STATE;
                             table_object->command_character_highlighted = 0;
+                            Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) >= 3 && stdin_buffer[0] == 27 && stdin_buffer[1] == 91){
@@ -139,11 +142,13 @@ int main(int argc, char **argv){
                     else if(state == MOVE_STATE){
                         if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 'm' || stdin_buffer[0] == 'r')){
                             state = REGULAR_STATE;
+                            Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 27){
                             state = COMMAND_STATE;
                             table_object->command_character_highlighted = 0;
+                            Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) >= 3 && stdin_buffer[0] == 27 && stdin_buffer[1] == 91){
@@ -165,6 +170,7 @@ int main(int argc, char **argv){
                         if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 27){    // ESC
                             delete_command(table_object);
                             state = REGULAR_STATE;
+                            Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) >= 3 && stdin_buffer[0] == 27 && stdin_buffer[1] == 91){
@@ -184,19 +190,23 @@ int main(int argc, char **argv){
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 10){   // enter
                             running = execute_command(table_object, config, config->commands_history_length);
                             state = REGULAR_STATE;
+                            Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 127 || stdin_buffer[0] == 8)){    // backspace
                             refresh_screen_bool = on_command_backspace(table_object);
+                            Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                         }
                         else{
                             refresh_screen_bool = on_command_characters(table_object, command_string_size, stdin_buffer[0]);
+                            Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                         }
                     }
                     else if(state == EDIT_STATE){
                         if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 27 || stdin_buffer[0] == 10)){    // ESC or enter
                             reset_character_highlighted_to_default_value(table_object);
                             state = REGULAR_STATE;
+                            Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(strlen(stdin_buffer) >= 3 && stdin_buffer[0] == 27 && stdin_buffer[1] == 91){
