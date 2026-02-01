@@ -13,6 +13,15 @@
 #include "../lib/constants.h"
 #include "../lib/utils.h"
 
+void Update_Display_Text(display_text_type display_text, char *text, int type){
+    if(display_text->text != NULL){
+        free(display_text->text);
+    }
+    display_text->text = malloc((strlen(text) + 1) + sizeof(char));
+    strcpy(display_text->text, text);
+    display_text->type = type;
+}
+
 void Get_File_Characteristics(table_type table_object, config_type config){
     FILE *f = fopen(config->input_file, "r");
     if(f == NULL){
@@ -286,7 +295,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     fclose(f);
 }
 
-void Print_Table(table_type table_object, config_type config, int state){
+void Print_Table(table_type table_object, config_type config, display_text_type display_text){
     char *output = NULL;
     #ifdef __linux__
     Scrollback_To_Screen_Start();
@@ -1015,6 +1024,7 @@ void Print_Table(table_type table_object, config_type config, int state){
             add_to_display_buffer(" ", output);
         }
     }
+
     // Print comand and stuff from the very last line
     width_counter = 0;
     int digit_count_length = table_object->table_length > 9 ? (int) floor(log10(table_object->table_length)) + 1 : 2;
@@ -1025,52 +1035,33 @@ void Print_Table(table_type table_object, config_type config, int state){
     int digit_active_character = table_object->character_highlighted > 0 ? (int) floor(log10(table_object->character_highlighted)) + 1 : (table_object->character_highlighted < 0 ? 2 : 1);
     int in_table_coord_size = digit_count_length + digit_count_width + digit_count_character + 2;
     int max_command_display_size = config->window_width - in_table_coord_size;
-    for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
-        if(i == table_object->command_character_highlighted){
-            Selection_Content_Colors(config, output);
+
+    if(display_text->type & BOTTOM_TEXT){
+        for(int i = 0; i < strlen(display_text->text); i++){
+            if(i == table_object->command_character_highlighted){
+                Selection_Content_Colors(config, output);
+            }
+            char_buffer[0] = display_text->text[i];
+            add_to_display_buffer(char_buffer, output);
+            width_counter++;
+            if(i == table_object->command_character_highlighted){
+                Default_Colors(config, output);
+            }
         }
-        char_buffer[0] = table_object->command[table_object->active_command][i];
-        add_to_display_buffer(char_buffer, output);
-        width_counter++;
-        if(i == table_object->command_character_highlighted){
+        if(table_object->command_character_highlighted == strlen(display_text->text)){
+            Selection_Content_Colors(config, output);
+            add_to_display_buffer(" ", output);
+            width_counter++;
             Default_Colors(config, output);
         }
     }
-    switch(state){
-        case REGULAR_STATE:
-            add_to_display_buffer("-- SELECTION --", output);
-            width_counter += strlen("-- SELECTION --");
-            break;
-        case MOVE_STATE:
-            add_to_display_buffer("-- MOVE --", output);
-            width_counter += strlen("-- MOVE --");
-            break;
-        case COMMAND_STATE:
-            break;
-        case EDIT_STATE:
-            add_to_display_buffer("-- INSERT --", output);
-            width_counter += strlen("-- INSERT --");
-            break;
-        default:
-            break;
-    }
+
     // Fill the rest of the characters after the comand
-    if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
-        Selection_Content_Colors(config, output);
+    for(int i = width_counter; i < max_command_display_size; i++){
         add_to_display_buffer(" ", output);
         width_counter++;
-        Default_Colors(config, output);
-        for(int i = width_counter + 1; i < max_command_display_size; i++){
-            add_to_display_buffer(" ", output);
-            width_counter++;
-        }
     }
-    else{
-        for(int i = width_counter; i < max_command_display_size; i++){
-            add_to_display_buffer(" ", output);
-            width_counter++;
-        }
-    }
+
     // Print coord information
     for(int i = 0; i < digit_count_length - digit_active_line; i++){
         add_to_display_buffer(" ", output);
