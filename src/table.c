@@ -11,6 +11,16 @@
 #endif
 #include "../lib/table.h"
 #include "../lib/constants.h"
+#include "../lib/utils.h"
+
+void Update_Display_Text(display_text_type display_text, char *text, int type){
+    if(display_text->text != NULL){
+        free(display_text->text);
+    }
+    display_text->text = malloc((strlen(text) + 1) + sizeof(char));
+    strcpy(display_text->text, text);
+    display_text->type = type;
+}
 
 void Get_File_Characteristics(table_type table_object, config_type config){
     FILE *f = fopen(config->input_file, "r");
@@ -47,6 +57,44 @@ void Get_File_Characteristics(table_type table_object, config_type config){
     return;
 }
 
+void Update_Column_Type_By_Cell_Value(int *column_type, char* cell_value, int size){
+    switch(*column_type){
+        case COLUMN_TYPE_STRING:
+            break;
+        case COLUMN_TYPE_DATE:
+            if(!Is_Date(cell_value, size)){
+                *column_type = COLUMN_TYPE_STRING;
+            }
+            break;
+        case COLUMN_TYPE_DECIMAL:
+            if(!Is_Decimal(cell_value, size)){
+                if(!Is_Date(cell_value, size)){
+                    *column_type = COLUMN_TYPE_STRING;
+                }
+                else
+                    *column_type = COLUMN_TYPE_DATE;
+            }
+            break;
+        case COLUMN_TYPE_INTEGER:
+            if(!Is_Integer(cell_value, size)){
+                if(!Is_Decimal(cell_value, size)){
+                    if(!Is_Date(cell_value, size)){
+                        *column_type = COLUMN_TYPE_STRING;
+                    }
+                    else
+                        *column_type = COLUMN_TYPE_DATE;
+                }
+                else
+                    *column_type = COLUMN_TYPE_DECIMAL;
+            }
+            break;
+        default:
+            break;
+    }
+    // printf("%d\n", *column_type);
+    return;
+}
+
 void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_in_file, int end_in_file, int start_to_replace, int memory_to_replace){
     // char sep = ';'; // Follows the RFC 4180, to change later to accept other separators
     Get_File_Characteristics(table_object, config);
@@ -69,9 +117,11 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
             // printf(line);
             if(i == 0){ // if in header
                 table_object->header = malloc(table_object->table_width * sizeof(*table_object->header));
+                table_object->type = malloc(table_object->table_width * sizeof(int));
                 for(int j = 0; j < table_object->table_width; j++){
                     table_object->header[j] = malloc((config->cell_max_width + 1) * sizeof(char));
                     table_object->header[j][0] = '\0';
+                    table_object->type[j] = COLUMN_TYPE_INTEGER;
                 }
                 table_object->columns_order_of_display = malloc(table_object->table_width * sizeof(int));
                 for(int j = 0; j < table_object->table_width; j++){
@@ -161,11 +211,12 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                 col_num = 0;
                 in_cell_iterator = 0;
                 for(int j = 0; j < strlen(line) + 1; j++){  // +1 to be sure of getting a '\0' character
-                    if(in_quotes != 1 && line[j] == config->input_separator){
+                    if(in_quotes != 1 && line[j] == config->input_separator){   // End of cell
                         table_object->table[line_num][col_num][in_cell_iterator] = '\0';
                         if(strlen(table_object->table[line_num][col_num]) > table_object->cell_width[col_num])
                             table_object->cell_width[col_num] = strlen(table_object->table[line_num][col_num]);
                         // printf("%s\n", table_object->table[line_num][col_num]);
+                        Update_Column_Type_By_Cell_Value(&table_object->type[col_num], table_object->table[line_num][col_num], in_cell_iterator);
                         col_num++;
                         in_cell_iterator = 0;
                         in_quotes = 0;
@@ -177,13 +228,13 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
                         // printf("%s\n", table_object->table[line_num][col_num]);
                         in_quotes = 0;
                     }
-                    else if(in_quotes == 0 && line[j] == '\"'){
+                    else if(in_quotes == 0 && line[j] == '\"'){ // Start of a quote
                         in_quotes++;
                     }
-                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] != '\"'){  // End of a quote
                         in_quotes++;
                     }
-                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){
+                    else if(in_quotes == 1 && line[j] == '\"' && line[j + 1] == '\"'){  // Inline quote (quote to keep in the display)
                         if(in_cell_iterator < config->cell_max_width){
                             table_object->table[line_num][col_num][in_cell_iterator] = line[j];
                             in_cell_iterator++;
@@ -244,7 +295,7 @@ void Fetch_Data_From_Csv(table_type table_object, config_type config, int start_
     fclose(f);
 }
 
-void Print_Table(table_type table_object, config_type config, int state){
+void Print_Table(table_type table_object, config_type config, display_text_type display_text){
     char *output = NULL;
     #ifdef __linux__
     Scrollback_To_Screen_Start();
@@ -973,60 +1024,44 @@ void Print_Table(table_type table_object, config_type config, int state){
             add_to_display_buffer(" ", output);
         }
     }
+
     // Print comand and stuff from the very last line
     width_counter = 0;
     int digit_count_length = table_object->table_length > 9 ? (int) floor(log10(table_object->table_length)) + 1 : 2;
     int digit_count_width = table_object->table_width > 9 ? (int) floor(log10(table_object->table_width)) + 1 : 2;
+    int digit_count_character = config->cell_max_width > 9 ? (int) floor(log10(config->cell_max_width)) + 1 : 2;
     int digit_active_line = table_object->active_line > 0 ? (int) floor(log10(table_object->active_line)) + 1 : (table_object->active_line < 0 ? 2 : 1);
     int digit_active_column = table_object->active_column > 0 ? (int) floor(log10(table_object->active_column)) + 1 : (table_object->active_column < 0 ? 2 : 1);
-    int in_table_coord_size = digit_count_length + digit_count_width + 1;
+    int digit_active_character = table_object->character_highlighted > 0 ? (int) floor(log10(table_object->character_highlighted)) + 1 : (table_object->character_highlighted < 0 ? 2 : 1);
+    int in_table_coord_size = digit_count_length + digit_count_width + digit_count_character + 2;
     int max_command_display_size = config->window_width - in_table_coord_size;
-    for(int i = 0; i < strlen(table_object->command[table_object->active_command]); i++){
-        if(i == table_object->command_character_highlighted){
-            Selection_Content_Colors(config, output);
+
+    if(display_text->type & BOTTOM_TEXT){
+        for(int i = 0; i < strlen(display_text->text); i++){
+            if(i == table_object->command_character_highlighted){
+                Selection_Content_Colors(config, output);
+            }
+            char_buffer[0] = display_text->text[i];
+            add_to_display_buffer(char_buffer, output);
+            width_counter++;
+            if(i == table_object->command_character_highlighted){
+                Default_Colors(config, output);
+            }
         }
-        char_buffer[0] = table_object->command[table_object->active_command][i];
-        add_to_display_buffer(char_buffer, output);
-        width_counter++;
-        if(i == table_object->command_character_highlighted){
+        if(table_object->command_character_highlighted == strlen(display_text->text)){
+            Selection_Content_Colors(config, output);
+            add_to_display_buffer(" ", output);
+            width_counter++;
             Default_Colors(config, output);
         }
     }
-    switch(state){
-        case REGULAR_STATE:
-            add_to_display_buffer("-- SELECTION --", output);
-            width_counter += strlen("-- SELECTION --");
-            break;
-        case MOVE_STATE:
-            add_to_display_buffer("-- MOVE --", output);
-            width_counter += strlen("-- MOVE --");
-            break;
-        case COMMAND_STATE:
-            break;
-        case EDIT_STATE:
-            add_to_display_buffer("-- INSERT --", output);
-            width_counter += strlen("-- INSERT --");
-            break;
-        default:
-            break;
-    }
+
     // Fill the rest of the characters after the comand
-    if(table_object->command_character_highlighted == strlen(table_object->command[table_object->active_command])){
-        Selection_Content_Colors(config, output);
+    for(int i = width_counter; i < max_command_display_size; i++){
         add_to_display_buffer(" ", output);
         width_counter++;
-        Default_Colors(config, output);
-        for(int i = width_counter + 1; i < max_command_display_size; i++){
-            add_to_display_buffer(" ", output);
-            width_counter++;
-        }
     }
-    else{
-        for(int i = width_counter; i < max_command_display_size; i++){
-            add_to_display_buffer(" ", output);
-            width_counter++;
-        }
-    }
+
     // Print coord information
     for(int i = 0; i < digit_count_length - digit_active_line; i++){
         add_to_display_buffer(" ", output);
@@ -1039,6 +1074,13 @@ void Print_Table(table_type table_object, config_type config, int state){
     sprintf(char_buffer, "%d", table_object->active_column);
     add_to_display_buffer(char_buffer, output);
     for(int i = 0; i < digit_count_width - digit_active_column; i++){
+        add_to_display_buffer(" ", output);
+    }
+    add_to_display_buffer(",", output);
+    // itoa(table_object->active_column, char_buffer, 10);
+    sprintf(char_buffer, "%d", table_object->character_highlighted);
+    add_to_display_buffer(char_buffer, output);
+    for(int i = 0; i < digit_count_character - digit_active_character; i++){
         add_to_display_buffer(" ", output);
     }
     
@@ -1060,6 +1102,12 @@ void Print_Table(table_type table_object, config_type config, int state){
     printf("\e[0m");
     free(output);
     #endif
+
+    // FILE* debug_type_file = fopen("./col_types.txt", "w");
+    // for(int i = 0; i < table_object->table_width; i++){
+    //     fprintf(debug_type_file, "%d\n", table_object->type[i]);
+    // }
+    // fclose(debug_type_file);
 }
 
 void Save_Table(table_type table_object, config_type config){
@@ -1115,6 +1163,7 @@ table_type Free_Table_Object(table_type table_object, config_type config){
         free(table_object->header[j]);
     }
     free(table_object->header);
+    free(table_object->type);
     
     free(table_object->columns_order_of_display);
     

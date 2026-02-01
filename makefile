@@ -3,7 +3,7 @@ export CC=gcc
 export CFLAGS= -Wall
 export LDFLAGS= -Wall
 export EXEC=csv_editor
-SRCNAMES= main.c table.c actions.c colors.c config.c
+SRCNAMES= main.c table.c actions.c colors.c config.c utils.c
 export SRCDIR=src
 SRC= $(foreach srcname, $(SRCNAMES), $(SRCDIR)/$(srcname))
 OBJNAMES= $(SRCNAMES:.c=.o)
@@ -56,7 +56,7 @@ endif
 export LIBRARY_TYPE
 
 compile:bin obj $(OBJNAMES)
-	$(CC) $(OBJ) -o $(EXEC) $(LDFLAGS)
+	$(CC) $(OBJ) -o $(BINDIR)$(FILE_SLASH)$(EXEC) $(LDFLAGS)
 
 %.o:
 	$(CC) -c $(SRCDIR)/$(@:.o=.c) -o $(OBJDIR)/$@ $(CFLAGS)
@@ -74,4 +74,4 @@ clean:
 	$(RMDIR) $(OBJDIR)
 	$(RMFILE) $(BINDIR)$(FILE_SLASH)*
 	$(RMDIR) $(BINDIR)
-	$(RMFILE) *.exe
+# 	$(RMFILE) *.exe
