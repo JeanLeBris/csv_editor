@@ -210,11 +210,13 @@ int on_command_go_right(table_type table_object){
     return 0;
 }
 
-int execute_command(table_type table_object, config_type config, int commands_history_length){
+int execute_command(table_type table_object, config_type config, int commands_history_length, display_text_type display_text){
     int buffer = 0;
     int running = 1;
     char *command_buffer = NULL;
     char seps[] = " \n\"";
+    char *buffer_string = malloc(1 * sizeof(char));
+    buffer_string[0] = '\0';
     if(table_object->active_command != 0){
         strcpy(table_object->command[0], table_object->command[table_object->active_command]);
     }
@@ -326,6 +328,43 @@ int execute_command(table_type table_object, config_type config, int commands_hi
             table_object->active_line++;
         }
     }
+    else if(strstr(command_buffer, ":exec(")){
+        buffer = 1;
+        for(char *command_buffer_substring = &command_buffer[6]; command_buffer_substring[0] != '\0'; command_buffer_substring = &command_buffer_substring[1]){
+            if(command_buffer_substring[0] == '('){
+                buffer++;
+            }
+            else if(command_buffer_substring[0] == ')'){
+                buffer--;
+            }
+            if(buffer == 0){
+                break;
+            }
+        }
+        if(buffer == 0){    // If exec command has the right count of '(' and ')'
+            for(char *command_buffer_substring = &command_buffer[5]; command_buffer_substring[0] != '\0'; command_buffer_substring = &command_buffer_substring[1]){
+                if(strstr(command_buffer_substring, "get ") == command_buffer_substring){
+                    command_buffer_substring = strstr(command_buffer_substring, "get ") + strlen("get ");
+                    if(strstr(command_buffer_substring, "column_types ") == command_buffer_substring){
+                        command_buffer_substring = strstr(command_buffer_substring, "column_types ") + strlen("column_types");
+                        for(int i = 0; i < table_object->table_width; i++){
+                            buffer_string = realloc(buffer_string, strlen(buffer_string) + 3);
+                            sprintf(buffer_string, "%s%d\n", buffer_string, table_object->type[table_object->columns_order_of_display[i]]);
+                        }
+                    }
+                }
+                else if(strstr(command_buffer_substring, "> ") == command_buffer_substring){
+                    command_buffer_substring = strstr(command_buffer_substring, "> ") + strlen("> ");
+                    FILE* output_file = fopen(strtok(command_buffer_substring, " )"), "w");
+                    fprintf(output_file, buffer_string);
+                    fclose(output_file);
+                    buffer_string = realloc(buffer_string, 1 * sizeof(char));
+                    buffer_string[0] = '\0';
+                }
+            }
+            Update_Display_Text(display_text, buffer_string, BOTTOM_TEXT + REGULAR_TEXT);
+        }
+    }
     buffer = 0;
     for(int i = 0; i < commands_history_length && strcmp(table_object->command[i], "\0") != 0; i++){
         buffer = i;
@@ -336,6 +375,7 @@ int execute_command(table_type table_object, config_type config, int commands_hi
     table_object->command[0][0] = '\0';
     table_object->command_character_highlighted = -1;
     table_object->active_command = 0;
+    free(buffer_string);
     return running;
 }
 

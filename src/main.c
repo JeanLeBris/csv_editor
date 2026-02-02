@@ -188,7 +188,7 @@ int main(int argc, char **argv){
                             }
                         }
                         else if(strlen(stdin_buffer) == 1 && stdin_buffer[0] == 10){   // enter
-                            running = execute_command(table_object, config, config->commands_history_length);
+                            running = execute_command(table_object, config, config->commands_history_length, display_text);
                             state = REGULAR_STATE;
                             Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
@@ -309,21 +309,25 @@ int main(int argc, char **argv){
                             c = getch();
                             if(c == 72){    // Up
                                 refresh_screen_bool = on_command_go_up(table_object, config->commands_history_length);
+                                Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             }
                             else if(c == 80){   // Down
                                 refresh_screen_bool = on_command_go_down(table_object);
+                                Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             }
                             else if(c == 75){   // Left
                                 refresh_screen_bool = on_command_go_left(table_object);
+                                Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             }
                             else if(c == 77){   // Right
                                 refresh_screen_bool = on_command_go_right(table_object);
+                                Update_Display_Text(display_text, table_object->command[table_object->active_command], BOTTOM_TEXT + REGULAR_TEXT);
                             }
                         }
                         else if(c == 13){   // enter
-                            running = execute_command(table_object, config, config->commands_history_length);
+                            running = execute_command(table_object, config, config->commands_history_length, display_text);
                             state = REGULAR_STATE;
-                            Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
+                            // Update_Display_Text(display_text, "-- SELECTION --", BOTTOM_TEXT + REGULAR_TEXT);
                             refresh_screen_bool = 1;
                         }
                         else if(c == 8){    // backspace
@@ -375,6 +379,8 @@ int main(int argc, char **argv){
         }
         
         table_object = Free_Table_Object(table_object, config);
+        free(display_text->text);
+        free(display_text);
         free(config);   // Push to right place, useless here
         free(string_buffer);
 
