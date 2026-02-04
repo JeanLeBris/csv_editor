@@ -9,6 +9,7 @@ void Set_Locale(config_type config);
 int utf8_strlen(char* string);
 int encoding_strlen(char* string, config_type config);
 int length_of_first_character(char* string, config_type config);
+int length_of_last_character(char* string, config_type config);
 int displayed_length_to_logical_length(char* string, int displayed_length, config_type config);
 
 int Is_Integer(char *value, int size);

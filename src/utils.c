@@ -64,6 +64,25 @@ int length_of_first_character(char* string, config_type config){
     return output;
 }
 
+int length_of_last_character(char* string, config_type config){
+    int output = 0;
+    switch(config->encoding){
+        case ENCODING_ASCII:
+            output = 1;
+            break;
+        case ENCODING_UTF8:
+            output = 1;
+            for(char* character = &string[-1]; !(char)((*character + 0x80) & 0xC0); character = &character[-1]){
+                output++;
+            }
+            break;
+        default:
+            output = 1;
+            break;
+    }
+    return output;
+}
+
 int displayed_length_to_logical_length(char* string, int displayed_length, config_type config){
     int output = 0;
     for(int i = 0; i < displayed_length; i++){
