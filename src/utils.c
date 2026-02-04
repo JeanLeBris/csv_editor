@@ -28,7 +28,18 @@ int utf8_strlen(char* string){
 }
 
 int encoding_strlen(char* string, config_type config){
-
+    int output = 0;
+    switch(config->encoding){
+        case ENCODING_ASCII:
+            output = strlen(string);
+            break;
+        case ENCODING_UTF8:
+            output = utf8_strlen(string);
+        default:
+            output = strlen(string);
+            break;
+    }
+    return output;
 }
 
 int Is_Integer(char *value, int size){
