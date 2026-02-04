@@ -43,6 +43,35 @@ int encoding_strlen(char* string, config_type config){
     return output;
 }
 
+int length_of_first_character(char* string, config_type config){
+    int output = 0;
+    switch(config->encoding){
+        case ENCODING_ASCII:
+            output = 1;
+            break;
+        case ENCODING_UTF8:
+            output = 1;
+            if((*string & 0xC0) == 0xC0){
+                for(char* character = &string[1]; !(char)((*character + 0x80) & 0xC0); character = &character[1]){
+                    output++;
+                }
+            }
+            break;
+        default:
+            output = 1;
+            break;
+    }
+    return output;
+}
+
+int displayed_length_to_logical_length(char* string, int displayed_length, config_type config){
+    int output = 0;
+    for(int i = 0; i < displayed_length; i++){
+        output += length_of_first_character(&string[output], config);
+    }
+    return output;
+}
+
 int Is_Integer(char *value, int size){
     for(int i = 0; i < size && value[i] != 0; i++){
         // If value is written with the scientific notation (XXXe+YYY or XXXe-YYY)
