@@ -1,5 +1,35 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <locale.h>
+#ifdef _WIN64
+#include <windows.h>
+#endif
+
+#include "../lib/utils.h"
+
+void Set_Locale(config_type config){
+    if(config->encoding == ENCODING_UTF8){
+        #ifdef _WIN64
+        SetConsoleOutputCP(CP_UTF8);
+        #endif
+        setlocale(LC_ALL, "UTF-8");
+    }
+}
+
+int utf8_strlen(char* string){
+    int count = 0;
+    for(int i = 0; i < strlen(string); i++){
+        if(((char)(string[i] + 0x80)) & 0xC0){
+            count++;
+        }
+    }
+    return count;
+}
+
+int encoding_strlen(char* string, config_type config){
+
+}
 
 int Is_Integer(char *value, int size){
     for(int i = 0; i < size && value[i] != 0; i++){

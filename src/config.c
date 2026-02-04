@@ -64,6 +64,8 @@ void Set_Default_Config(config_type config, char *exe_path){
 
     config->commands_history_length = 100;
 
+    config->encoding = ENCODING_ASCII;
+
     strcpy(config->input_file, "");
 
     config->show_config = 0;
@@ -189,6 +191,17 @@ void Load_Config(config_type config){
             config->commands_history_length = atoi(strtok(NULL, seps));
             // printf("%s\n", config->commands_history_length);
         }
+        else if(strcmp(fragmented_line, "encoding") == 0){
+            // strcpy(config->commands_history_length, strtok(NULL, seps));
+            fragmented_line = strtok(NULL, seps);
+            if(strcmp(fragmented_line, "UTF-8") == 0){
+                config->encoding = ENCODING_UTF8;
+            }
+            else{
+                config->encoding = ENCODING_ASCII;
+            }
+            // printf("%s\n", config->commands_history_length);
+        }
     }
 
     #ifdef __linux__
@@ -215,6 +228,17 @@ void Get_Config_From_Args(config_type config, int argc, char **argv){
             if(i + 1 < argc && argv[i + 1][0] != "-"){
                 config->input_separator = argv[i + 1][0];
                 config->output_separator = config->input_separator;
+                i++;
+            }
+        }
+        else if(strcmp(argv[i], "--encoding") == 0 || strcmp(argv[i], "-e") == 0){
+            if(i + 1 < argc && argv[i + 1][0] != "-"){
+                if(strcmp(argv[i + 1], "UTF-8") == 0){
+                    config->encoding = ENCODING_UTF8;
+                }
+                else{
+                    config->encoding = ENCODING_ASCII;
+                }
                 i++;
             }
         }
@@ -303,6 +327,7 @@ void Print_Config(config_type config){
     no_output_string_display("\tWindow length : %d\n", config->window_length);
     no_output_string_display("Other :\n");
     no_output_string_display("\tCommands history length : %d\n", config->commands_history_length);
+    no_output_string_display("\tEncoding : %d\n", config->encoding);
     #ifdef __linux__
     nodelay(stdscr, FALSE);
     getch();

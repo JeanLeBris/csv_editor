@@ -24,6 +24,7 @@ endif */
 #include "../lib/table.h"
 #include "../lib/actions.h"
 #include "../lib/constants.h"
+#include "../lib/utils.h"
 
 int main(int argc, char **argv){
     #ifdef __linux__
@@ -38,6 +39,7 @@ int main(int argc, char **argv){
     Set_Default_Config(config, argv[0]);
     Load_Config(config);
     Get_Config_From_Args(config, argc, argv);
+    Set_Locale(config);
     Set_Window_Size(config);
     Set_Max_Table_Length(config);
     if(config->show_config){

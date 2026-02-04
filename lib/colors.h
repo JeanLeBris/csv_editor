@@ -2,7 +2,7 @@
 
 #define __COLORS__
 
-#include "./config.h"
+#include "config.h"
 
 void add_to_display_buffer(const char *string, char *output, ...);
 void no_output_string_display(const char *string, ...);
