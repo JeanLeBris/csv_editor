@@ -410,38 +410,38 @@ int on_command_characters(table_type table_object, int command_string_size, char
     return 0;
 }
 
-int on_edit_go_left(table_type table_object){
+int on_edit_go_left(table_type table_object, config_type config){
     if(table_object->active_line == -1){
         if(table_object->character_highlighted > 0){
             if(table_object->first_character_printed > 0 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
-                table_object->first_character_printed--;
+                table_object->first_character_printed -= length_of_last_character(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config);
             }
-            table_object->character_highlighted--;
+            table_object->character_highlighted -= length_of_last_character(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted], config);
             return 1;
         }
     }
     else{
         if(table_object->character_highlighted > 0){
             if(table_object->first_character_printed > 0 && table_object->character_highlighted == strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])){
-                table_object->first_character_printed--;
+                table_object->first_character_printed -= length_of_last_character(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config);
             }
-            table_object->character_highlighted--;
+            table_object->character_highlighted -= length_of_last_character(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted], config);
             return 1;
         }
     }
     return 0;
 }
 
-int on_edit_go_right(table_type table_object){
+int on_edit_go_right(table_type table_object, config_type config){
     if(table_object->active_line == -1){
         if(table_object->character_highlighted < strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
-            table_object->character_highlighted++;
+            table_object->character_highlighted += length_of_first_character(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted], config);
             return 1;
         }
     }
     else{
         if(table_object->character_highlighted < strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])){
-            table_object->character_highlighted++;
+            table_object->character_highlighted += length_of_first_character(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->character_highlighted], config);
             return 1;
         }
     }

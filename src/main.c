@@ -220,10 +220,10 @@ int main(int argc, char **argv){
                                 
                             }
                             else if(stdin_buffer[strlen(stdin_buffer) - 1] == 68){   // Left
-                                refresh_screen_bool = on_edit_go_left(table_object);
+                                refresh_screen_bool = on_edit_go_left(table_object, config);
                             }
                             else if(stdin_buffer[strlen(stdin_buffer) - 1] == 67){   // Right
-                                refresh_screen_bool = on_edit_go_right(table_object);
+                                refresh_screen_bool = on_edit_go_right(table_object, config);
                             }
                         }
                         else if(strlen(stdin_buffer) == 1 && (stdin_buffer[0] == 127 || stdin_buffer[0] == 8)){    // backspace
@@ -357,10 +357,10 @@ int main(int argc, char **argv){
                                 
                             }
                             else if(c == 75){   // Left
-                                refresh_screen_bool = on_edit_go_left(table_object);
+                                refresh_screen_bool = on_edit_go_left(table_object, config);
                             }
                             else if(c == 77){   // Right
-                                refresh_screen_bool = on_edit_go_right(table_object);
+                                refresh_screen_bool = on_edit_go_right(table_object, config);
                             }
                         }
                         else if(c == 8){    // backspace
