@@ -35,6 +35,7 @@ int encoding_strlen(char* string, config_type config){
             break;
         case ENCODING_UTF8:
             output = utf8_strlen(string);
+            break;
         default:
             output = strlen(string);
             break;
