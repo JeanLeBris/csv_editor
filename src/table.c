@@ -399,54 +399,46 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
     }
     // Finds which character to print first in selected cell
     if(table_object->character_highlighted > -1){
+        // If in header
         if(table_object->active_column > -1 && table_object->active_line == -1){
+            // If character highlighted is the element's next character
             if(table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
-                // table_object->first_character_printed = 1;
-                if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
-                    table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+                if(table_object->character_highlighted + 1 > displayed_length_to_logical_length(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width, config)){
+                    table_object->first_character_printed = table_object->character_highlighted - displayed_length_to_logical_length(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config);
                 }
                 else{
                     table_object->first_character_printed = 0;
                 }
             }
+            // If the character highlighted is before the first character printed
             else if(table_object->character_highlighted < table_object->first_character_printed){
                 table_object->first_character_printed = table_object->character_highlighted;
             }
-            else if(table_object->character_highlighted > table_object->first_character_printed + config->focused_cell_max_width - 1){
-                table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+            // If the character highlighted is after the last character printed
+            else if(table_object->character_highlighted > table_object->first_character_printed + displayed_length_to_logical_length(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config)){
+                table_object->first_character_printed = table_object->character_highlighted - displayed_length_to_logical_length(&table_object->header[table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config);
             }
         }
+        // If in body
         else if(table_object->active_column > -1 && table_object->active_line > -1){
+            // If character highlighted is the element's next character
             if(table_object->character_highlighted == strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]])){
-                // table_object->first_character_printed = 1;
-                if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
-                    table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+                if(table_object->character_highlighted + 1 > displayed_length_to_logical_length(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width, config)){
+                    table_object->first_character_printed = table_object->character_highlighted - displayed_length_to_logical_length(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config);
                 }
                 else{
                     table_object->first_character_printed = 0;
                 }
             }
+            // If the character highlighted is before the first character printed
             else if(table_object->character_highlighted < table_object->first_character_printed){
                 table_object->first_character_printed = table_object->character_highlighted;
             }
-            else if(table_object->character_highlighted > table_object->first_character_printed + config->focused_cell_max_width - 1){
-                table_object->first_character_printed = table_object->character_highlighted - config->focused_cell_max_width + 1;
+            // If the character highlighted is after the last character printed
+            else if(table_object->character_highlighted > table_object->first_character_printed + displayed_length_to_logical_length(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config)){
+                table_object->first_character_printed = table_object->character_highlighted - displayed_length_to_logical_length(&table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]][table_object->first_character_printed], config->focused_cell_max_width - 1, config);
             }
         }
-
-        // if(table_object->active_column > -1 && table_object->active_line > -2){
-        //     if(table_object->character_highlighted - table_object->first_character_printed + 1 > config->focused_cell_max_width){
-        //         if(table_object->character_highlighted + 1 > config->focused_cell_max_width){
-        //             table_object->first_character_printed = table_object->character_highlighted + 1 - config->focused_cell_max_width;
-        //         }
-        //         else{
-        //             table_object->first_character_printed = 0;
-        //         }
-        //     }
-        //     else if(table_object->character_highlighted - table_object->first_character_printed + 1 < 1){
-        //         table_object->first_character_printed = table_object->character_highlighted;
-        //     }
-        // }
     }
 
     // Header part
