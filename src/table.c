@@ -541,11 +541,11 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                         char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
                         add_to_display_buffer(char_buffer, output);
                     }
-                    j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                     if(table_object->active_line == -1 && j == table_object->character_highlighted){
                         // Default_Colors(config, output);
                         Header_Text_Colors(config, output);
                     }
+                    j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                     width_counter++;
                 }
                 if(table_object->active_line == -1 && table_object->character_highlighted == strlen(table_object->header[table_object->columns_order_of_display[table_object->active_column]])){
@@ -578,11 +578,11 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                 char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
                                 add_to_display_buffer(char_buffer, output);
                             }
-                            j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                             if(table_object->active_line == -1 && j == table_object->character_highlighted){
                                 // Default_Colors(config, output);
                                 Header_Text_Colors(config, output);
                             }
+                            j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                             // strcat(output, table_object->header[table_object->columns_order_of_display[i]][j]);
                             width_counter++;
                         }
@@ -612,11 +612,11 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                             char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
                             add_to_display_buffer(char_buffer, output);
                         }
-                        j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                         if(table_object->active_line == -1 && j == table_object->character_highlighted){
                             // Default_Colors(config, output);
                             Header_Text_Colors(config, output);
                         }
+                        j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                         width_counter++;
                     }
                 }
@@ -812,7 +812,6 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                             char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
                             add_to_display_buffer(char_buffer, output);
                         }
-                        k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                         if(table_object->active_line == i && k == table_object->character_highlighted){
                             if((i + 1)%2 == 0){
                                 Even_Text_Colors(config, output);
@@ -821,6 +820,7 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                 Odd_Text_Colors(config, output);
                             }
                         }
+                        k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                         width_counter++;
                     }
                     if(table_object->active_line == i && table_object->character_highlighted == strlen(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]])){
@@ -856,7 +856,6 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                     char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
                                     add_to_display_buffer(char_buffer, output);
                                 }
-                                k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                                 if(table_object->active_line == i && k == table_object->character_highlighted){
                                     if((i + 1)%2 == 0){
                                         Even_Text_Colors(config, output);
@@ -865,6 +864,7 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                         Odd_Text_Colors(config, output);
                                     }
                                 }
+                                k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                                 // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]][k]);
                                 width_counter++;
                             }
@@ -890,7 +890,6 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                 char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
                                 add_to_display_buffer(char_buffer, output);
                             }
-                            k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                             if(table_object->active_line == i && k == table_object->character_highlighted){
                                 if((i + 1)%2 == 0){
                                     Even_Text_Colors(config, output);
@@ -899,6 +898,7 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                     Odd_Text_Colors(config, output);
                                 }
                             }
+                            k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                             width_counter++;
                         }
                     }
