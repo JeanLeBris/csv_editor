@@ -13,6 +13,7 @@ void set_character_highlighted_to_last_character(table_type table_object){
     else{
         table_object->character_highlighted = strlen(table_object->table[table_object->active_line][table_object->columns_order_of_display[table_object->active_column]]);
     }
+    table_object->first_character_printed = 0;
 }
 
 void reset_character_highlighted_to_default_value(table_type table_object){
