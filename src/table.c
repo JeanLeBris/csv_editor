@@ -633,7 +633,7 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                     // I looked through the code to properly fix it but I didn't find it.
                     // This piece of code isn't exactly great but it seems to fix it
                     width_counter++;
-                    if(table_object->character_highlighted > config->focused_cell_max_width-1){
+                    if(table_object->character_highlighted > displayed_length_to_logical_length_forward(table_object->header[table_object->columns_order_of_display[table_object->active_column]], config->focused_cell_max_width-1, config)){
                         width_counter--;
                     }
                 }
@@ -920,7 +920,7 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                         // I looked through the code to properly fix it but I didn't find it.
                         // This piece of code isn't exactly great but it seems to fix it
                         width_counter++;
-                        if(table_object->character_highlighted > config->focused_cell_max_width-1){
+                        if(table_object->character_highlighted > displayed_length_to_logical_length_forward(table_object->table[i][table_object->columns_order_of_display[table_object->active_column]], config->focused_cell_max_width-1, config)){
                             width_counter--;
                         }
                     }
