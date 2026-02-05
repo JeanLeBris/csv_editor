@@ -83,11 +83,20 @@ int length_of_last_character(char* string, config_type config){
     return output;
 }
 
-int displayed_length_to_logical_length(char* string, int displayed_length, config_type config){
+int displayed_length_to_logical_length_forward(char* string, int displayed_length, config_type config){
     int output = 0;
     for(int i = 0; i < displayed_length; i++){
         output += length_of_first_character(&string[output], config);
     }
+    return output;
+}
+
+int displayed_length_to_logical_length_backward(char* string, int displayed_length, config_type config){
+    int output = 0;
+    for(int i = 0; i < displayed_length - 1; i++){
+        output += length_of_last_character(&string[-output], config);
+    }
+    output += length_of_first_character(&string[0], config);
     return output;
 }
 
