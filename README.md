@@ -77,6 +77,8 @@ cd ..
 
 ```csv_editor.exe [-i | --input] file.csv [-sep | --separator] ";"``` : Open file.csv with ';' as the separator value between the cells
 
+```csv_editor.exe [-i | --input] file.csv [-e | --encoding] UTF-8``` : Open file.csv encoded with UTF-8
+
 ```csv_editor.exe [-i | --input] file.csv --show-config``` : Display the configuration of the program
 
 ## Configuration
@@ -199,3 +201,19 @@ If you have selected a cell, you will be able to move it up, down, left or right
 If you have selected a row, you will be able to move it up and down and if you have selected a column you will be able to move it left and right.
 
 To put down the selected element, you can type the 'm' key to return to the `SELECTION` mode or you can type the Esc key to go back to the `COMMAND` mode.
+
+## Encoding support by platform
+
+### For Windows
+
+| Encoding | Input | Output |
+|:--------:|:-----:|:------:|
+| DOS | <span style="color:green">Supported</span> | <span style="color:green">Supported</span> |
+| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:green">Supported</span> |
+
+### For Linux
+
+| Encoding | Input | Output |
+|:--------:|:-----:|:------:|
+| DOS | <span style="color:green">Supported</span> | <span style="color:green">Supported</span> |
+| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:red">Not supported</span> |
