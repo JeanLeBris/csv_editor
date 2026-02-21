@@ -1175,7 +1175,7 @@ void Save_Table(table_type table_object, config_type config){
     }
     for(int j = 0; j < table_object->table_width; j++){
         fprintf(f, "\"");
-        fprintf(f, table_object->header[table_object->columns_order_of_display[j]]);
+        fprintf(f, "%s", table_object->header[table_object->columns_order_of_display[j]]);
         fprintf(f, "\"");
         if(j < table_object->table_width - 1){
             fprintf(f, "%c", config->output_separator);
@@ -1185,7 +1185,7 @@ void Save_Table(table_type table_object, config_type config){
     for(int i = 0; i < table_object->table_length; i++){
         for(int j = 0; j < table_object->table_width; j++){
             fprintf(f, "\"");
-            fprintf(f, table_object->table[i][table_object->columns_order_of_display[j]]);
+            fprintf(f, "%s", table_object->table[i][table_object->columns_order_of_display[j]]);
             fprintf(f, "\"");
             if(j < table_object->table_width - 1){
                 fprintf(f, "%c", config->output_separator);
