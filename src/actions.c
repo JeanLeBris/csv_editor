@@ -222,10 +222,18 @@ int execute_command(table_type table_object, config_type config, int commands_hi
         strcpy(table_object->command[0], table_object->command[table_object->active_command]);
     }
     command_buffer = table_object->command[0];
-    if(strcmp(command_buffer, ":q") == 0){
+    if(strcmp(command_buffer, ":q ") == 0 || strcmp(command_buffer, ":q\0") == 0){
         running = 0;
     }
-    else if(strstr(command_buffer, ":wq") == command_buffer){
+    else if(strstr(command_buffer, ":w ") == command_buffer || (strstr(command_buffer, ":w") == command_buffer && command_buffer[2] == '\0')){
+        command_buffer = strstr(command_buffer, ":w") + strlen(":w");
+        command_buffer = strtok(command_buffer, seps);
+        if(command_buffer != NULL){
+            strcpy(config->input_file, command_buffer);
+        }
+        Save_Table(table_object, config);
+    }
+    else if(strstr(command_buffer, ":wq ") == command_buffer || (strstr(command_buffer, ":wq") == command_buffer && command_buffer[3] == '\0')){
         command_buffer = strstr(command_buffer, ":wq") + strlen(":wq");
         command_buffer = strtok(command_buffer, seps);
         if(command_buffer != NULL){
