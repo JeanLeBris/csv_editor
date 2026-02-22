@@ -167,7 +167,9 @@ If you are on the `SELECTION` or the `MOVE` mode and type the Esc key, you will 
 
 If you want to quit without saving, you can use the `:q` command.
 
-If you want to save and quit, you can use the `:wq` command.
+If you want to save, you can use the `:w` command, you can also add a file path behind to save in a different file than the input one like this : `:w [file_name]`.
+
+If you want to save and quit, you can use the `:wq` command, you can also add a file path behind to save in a different file than the input one like this : `:wq [file_name]`.
 
 If you want to move around faster, you can use the `:jump` command and go to the nth row using the following format :
 ```
@@ -183,6 +185,22 @@ If you want to insert a new line below the one you are currently on, you can use
 ```
 :new line
 ```
+
+It is also possible to execute more complicated commands with the `:exec()` keyword, mostly for debugging purposes.
+
+#### The `exec()` command
+
+This command allows the user to fetch information from the program itself, most notably to debug some functionalities.
+
+The `get [variable]` keyword can fetch some variables' content, like for the example the `column_types`, which fetch the type associated to each columns.
+
+The `> [file]` keyword can write information to a file.
+
+By associating these commands to each other you can get results like this :
+```
+:exec(get column_types > output.txt)
+```
+Which gets the types of each columns and write them to a file called `output.txt`
 
 ### The INSERT mode
 
