@@ -11,6 +11,7 @@
 void Set_Locale(config_type config){
     if(config->encoding == ENCODING_UTF8){
         #ifdef _WIN64
+        SetConsoleCP(CP_UTF8);      // Last added, need to check the effect
         SetConsoleOutputCP(CP_UTF8);
         #endif
         setlocale(LC_ALL, "UTF-8");
