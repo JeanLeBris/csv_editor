@@ -12,7 +12,7 @@ endif */
 // #include <sys/ioctl.h>
 // #include <winioctl.h>
 #ifdef __linux__
-#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #endif
 #ifdef _WIN64
 #include <libloaderapi.h>
@@ -27,6 +27,11 @@ endif */
 #include "../lib/utils.h"
 
 int main(int argc, char **argv){
+    config_type config = malloc(sizeof(*config));
+    Set_Default_Config(config, argv[0]);
+    Load_Config(config);
+    Get_Config_From_Args(config, argc, argv);
+    Set_Locale(config);
     #ifdef __linux__
     initscr();
     start_color();
@@ -35,11 +40,9 @@ int main(int argc, char **argv){
     //scrollok(stdscr, TRUE);
     nodelay(stdscr, TRUE);
     #endif
-    config_type config = malloc(sizeof(*config));
     Set_Default_Config(config, argv[0]);
     Load_Config(config);
     Get_Config_From_Args(config, argc, argv);
-    Set_Locale(config);
     Set_Window_Size(config);
     Set_Max_Table_Length(config);
     if(config->show_config){

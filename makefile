@@ -35,7 +35,7 @@ ifeq ($(OS), Linux)
 	COPYFILE= cp
 	SHARED_LIBRARY_EXT= so
 	FILE_SLASH=/
-	LDFLAGS+= -lncurses -lm
+	LDFLAGS+= -lncursesw -lm
 endif
 endif
 endif

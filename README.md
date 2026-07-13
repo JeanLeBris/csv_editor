@@ -234,4 +234,4 @@ To put down the selected element, you can type the 'm' key to return to the `SEL
 | Encoding | Input | Output |
 |:--------:|:-----:|:------:|
 | DOS | <span style="color:green">Supported</span> | <span style="color:green">Supported</span> |
-| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:red">Not supported</span> |
+| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:green">Supported</span> |

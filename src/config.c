@@ -4,7 +4,7 @@
 #ifdef __linux__
 #include <sys/ioctl.h>
 #include <unistd.h>
-#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #endif
 #ifdef _WIN64
 #include <libloaderapi.h>

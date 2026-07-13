@@ -4,7 +4,7 @@
 #include <assert.h>
 #include <math.h>
 #ifdef __linux__
-#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #endif
 #ifdef _WIN64
 #include <windows.h>
@@ -544,9 +544,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                         Selection_Content_Colors(config, output);
                     }
                     for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                        char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                        add_to_display_buffer(char_buffer, output);
+                        char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                        char_buffer[k+1] = '\0';
                     }
+                    add_to_display_buffer(char_buffer, output);
                     if(table_object->active_line == -1 && j == table_object->character_highlighted){
                         // Default_Colors(config, output);
                         Header_Text_Colors(config, output);
@@ -581,9 +582,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                 Selection_Content_Colors(config, output);
                             }
                             for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                                char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                                add_to_display_buffer(char_buffer, output);
+                                char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                                char_buffer[k+1] = '\0';
                             }
+                            add_to_display_buffer(char_buffer, output);
                             if(table_object->active_line == -1 && j == table_object->character_highlighted){
                                 // Default_Colors(config, output);
                                 Header_Text_Colors(config, output);
@@ -595,11 +597,16 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                     }
                     else{
                         for(int j = 0; j < displayed_length_to_logical_length_forward(&table_object->header[table_object->columns_order_of_display[i]][0], config->focused_cell_max_width, config) && width_counter < config->window_width; j++){
-                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                            // char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j];
+                            for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
+                                char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                                char_buffer[k+1] = '\0';
+                            }
+                            add_to_display_buffer(char_buffer, output);
+                            j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                             // if(j == table_object->character_highlighted){
                             //     S_Selection_Content_Colors(config, output);
                             // }
-                            add_to_display_buffer(char_buffer, output);
                             // if(j == table_object->character_highlighted){
                             //     S_Default_Colors(config, output);
                             // }
@@ -615,9 +622,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                             Selection_Content_Colors(config, output);
                         }
                         for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                            add_to_display_buffer(char_buffer, output);
+                            char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                            char_buffer[k+1] = '\0';
                         }
+                        add_to_display_buffer(char_buffer, output);
                         if(table_object->active_line == -1 && j == table_object->character_highlighted){
                             // Default_Colors(config, output);
                             Header_Text_Colors(config, output);
@@ -655,9 +663,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                 // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                 for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                     for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                        char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                        add_to_display_buffer(char_buffer, output);
+                        char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                        char_buffer[k+1] = '\0';
                     }
+                    add_to_display_buffer(char_buffer, output);
                     j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                     width_counter++;
                 }
@@ -671,9 +680,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                 if(difference < 0){
                     for(int j = 0; j < displayed_length_to_logical_length_forward(&table_object->header[table_object->columns_order_of_display[i]][0], config->unfocused_cell_max_width, config) && width_counter < config->window_width; j++){
                         for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                            add_to_display_buffer(char_buffer, output);
+                            char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                            char_buffer[k+1] = '\0';
                         }
+                        add_to_display_buffer(char_buffer, output);
                         j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                         width_counter++;
                     }
@@ -682,9 +692,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                     // strcat(output, table_object->header[table_object->columns_order_of_display[i]]);
                     for(int j = 0; j < strlen(table_object->header[table_object->columns_order_of_display[i]]) && width_counter < config->window_width; j++){
                         for(int k = 0; k < length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config); k++){
-                            char_buffer[0] = table_object->header[table_object->columns_order_of_display[i]][j+k];
-                            add_to_display_buffer(char_buffer, output);
+                            char_buffer[k] = table_object->header[table_object->columns_order_of_display[i]][j+k];
+                            char_buffer[k+1] = '\0';
                         }
+                        add_to_display_buffer(char_buffer, output);
                         j += length_of_first_character(&table_object->header[table_object->columns_order_of_display[i]][j], config) - 1;
                         width_counter++;
                     }
@@ -815,9 +826,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                             Selection_Content_Colors(config, output);
                         }
                         for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                            char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                            add_to_display_buffer(char_buffer, output);
+                            char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                            char_buffer[l+1] = '\0';
                         }
+                        add_to_display_buffer(char_buffer, output);
                         if(table_object->active_line == i && k == table_object->character_highlighted){
                             if((i + 1)%2 == 0){
                                 Even_Text_Colors(config, output);
@@ -859,9 +871,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                     Selection_Content_Colors(config, output);
                                 }
                                 for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                                    char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                                    add_to_display_buffer(char_buffer, output);
+                                    char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                                    char_buffer[l+1] = '\0';
                                 }
+                                add_to_display_buffer(char_buffer, output);
                                 if(table_object->active_line == i && k == table_object->character_highlighted){
                                     if((i + 1)%2 == 0){
                                         Even_Text_Colors(config, output);
@@ -878,9 +891,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                         else{
                             for(int k = 0; k < displayed_length_to_logical_length_forward(&table_object->table[i][table_object->columns_order_of_display[j]][0], config->focused_cell_max_width, config) && width_counter < config->window_width; k++){
                                 for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                                    char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                                    add_to_display_buffer(char_buffer, output);
+                                    char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                                    char_buffer[l+1] = '\0';
                                 }
+                                add_to_display_buffer(char_buffer, output);
                                 k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                                 width_counter++;
                             }
@@ -893,9 +907,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                                 Selection_Content_Colors(config, output);
                             }
                             for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                                char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                                add_to_display_buffer(char_buffer, output);
+                                char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                                char_buffer[l+1] = '\0';
                             }
+                            add_to_display_buffer(char_buffer, output);
                             if(table_object->active_line == i && k == table_object->character_highlighted){
                                 if((i + 1)%2 == 0){
                                     Even_Text_Colors(config, output);
@@ -947,9 +962,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                     // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                     for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                         for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                            char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                            add_to_display_buffer(char_buffer, output);
+                            char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                            char_buffer[l+1] = '\0';
                         }
+                        add_to_display_buffer(char_buffer, output);
                         k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                         width_counter++;
                     }
@@ -963,9 +979,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                     if(difference < 0){
                         for(int k = 0; k < displayed_length_to_logical_length_forward(&table_object->table[i][table_object->columns_order_of_display[j]][0], config->unfocused_cell_max_width, config) && width_counter < config->window_width; k++){
                             for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                                char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                                add_to_display_buffer(char_buffer, output);
+                                char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                                char_buffer[l+1] = '\0';
                             }
+                            add_to_display_buffer(char_buffer, output);
                             k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                             width_counter++;
                         }
@@ -974,9 +991,10 @@ void Print_Table(table_type table_object, config_type config, display_text_type 
                         // strcat(output, table_object->table[i][table_object->columns_order_of_display[j]]);
                         for(int k = 0; k < strlen(table_object->table[i][table_object->columns_order_of_display[j]]) && width_counter < config->window_width; k++){
                             for(int l = 0; l < length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config); l++){
-                                char_buffer[0] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
-                                add_to_display_buffer(char_buffer, output);
+                                char_buffer[l] = table_object->table[i][table_object->columns_order_of_display[j]][k+l];
+                                char_buffer[l+1] = '\0';
                             }
+                            add_to_display_buffer(char_buffer, output);
                             k += length_of_first_character(&table_object->table[i][table_object->columns_order_of_display[j]][k], config) - 1;
                             width_counter++;
                         }

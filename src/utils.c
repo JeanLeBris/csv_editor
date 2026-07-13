@@ -9,12 +9,19 @@
 #include "../lib/utils.h"
 
 void Set_Locale(config_type config){
-    if(config->encoding == ENCODING_UTF8){
+    if(config->encoding == ENCODING_ASCII){
+        #ifdef _WIN64
+        SetConsoleOutputCP(CP_UTF8);
+        #endif
+        setlocale(LC_ALL, "ANSI");
+    }
+    else if(config->encoding == ENCODING_UTF8){
         #ifdef _WIN64
         SetConsoleCP(CP_UTF8);      // Last added, need to check the effect
         SetConsoleOutputCP(CP_UTF8);
         #endif
-        setlocale(LC_ALL, "UTF-8");
+        // setlocale(LC_ALL, "UTF-8");
+        setlocale(LC_ALL, "");
     }
 }
 
