@@ -358,7 +358,7 @@ int execute_command(table_type table_object, config_type config, int commands_hi
                         command_buffer_substring = strstr(command_buffer_substring, "column_types ") + strlen("column_types");
                         for(int i = 0; i < table_object->table_width; i++){
                             buffer_string = realloc(buffer_string, strlen(buffer_string) + 3);
-                            sprintf(buffer_string, "%s%d\n", buffer_string, table_object->type[table_object->columns_order_of_display[i]]);
+                            sprintf(buffer_string, "%s%d ", buffer_string, table_object->type[table_object->columns_order_of_display[i]]);
                         }
                     }
                 }
