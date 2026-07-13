@@ -20,8 +20,8 @@ void Set_Locale(config_type config){
         SetConsoleCP(CP_UTF8);      // Last added, need to check the effect
         SetConsoleOutputCP(CP_UTF8);
         #endif
-        // setlocale(LC_ALL, "UTF-8");
-        setlocale(LC_ALL, "");
+        setlocale(LC_ALL, "UTF-8");
+        // setlocale(LC_ALL, "");
     }
 }
 
