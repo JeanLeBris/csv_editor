@@ -66,7 +66,6 @@ int main(int argc, char **argv){
         int running = 1;
         char c;
         int state = REGULAR_STATE;
-        int buffer = 0;
         int window_columns_buffer = 0;
         int window_rows_buffer = 0;
         char *string_buffer = malloc((config->cell_max_width + 1) * sizeof(char));
@@ -76,7 +75,6 @@ int main(int argc, char **argv){
             table_object->command[i] = malloc(command_string_size * sizeof(char));
             table_object->command[i][0] = '\0';
         }
-        char *command_buffer = NULL;
         table_object->command_character_highlighted = -1;
         table_object->active_command = 0;
 

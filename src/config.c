@@ -219,20 +219,20 @@ void Load_Config(config_type config){
 void Get_Config_From_Args(config_type config, int argc, char **argv){
     for(int i = 1; i < argc; i++){
         if(strcmp(argv[i], "--input") == 0 || strcmp(argv[i], "-i") == 0){
-            if(i + 1 < argc && argv[i + 1][0] != "-"){
+            if(i + 1 < argc && argv[i + 1][0] != '-'){
                 strcpy(config->input_file, argv[i + 1]);
                 i++;
             }
         }
         else if(strcmp(argv[i], "--separator") == 0 || strcmp(argv[i], "-sep") == 0){
-            if(i + 1 < argc && argv[i + 1][0] != "-"){
+            if(i + 1 < argc && argv[i + 1][0] != '-'){
                 config->input_separator = argv[i + 1][0];
                 config->output_separator = config->input_separator;
                 i++;
             }
         }
         else if(strcmp(argv[i], "--encoding") == 0 || strcmp(argv[i], "-e") == 0){
-            if(i + 1 < argc && argv[i + 1][0] != "-"){
+            if(i + 1 < argc && argv[i + 1][0] != '-'){
                 if(strcmp(argv[i + 1], "UTF-8") == 0){
                     config->encoding = ENCODING_UTF8;
                 }
