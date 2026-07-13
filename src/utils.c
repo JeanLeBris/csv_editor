@@ -19,9 +19,11 @@ void Set_Locale(config_type config){
         #ifdef _WIN64
         SetConsoleCP(CP_UTF8);      // Last added, need to check the effect
         SetConsoleOutputCP(CP_UTF8);
-        #endif
         setlocale(LC_ALL, "UTF-8");
-        // setlocale(LC_ALL, "");
+        #endif
+        #ifdef __linux__
+        setlocale(LC_ALL, "");
+        #endif
     }
 }
 
