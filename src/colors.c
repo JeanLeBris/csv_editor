@@ -2,20 +2,25 @@
 #include <stdlib.h>
 #include <string.h>
 #ifdef __linux__
-#include <ncurses.h>
+#include <ncursesw/ncurses.h>
 #endif
 #ifdef  _WIN64
 #include <windows.h>
 #endif
 #include "../lib/colors.h"
+#include "../lib/utils.h"
 
 #ifdef __linux__
 void add_to_display_buffer(const char *string, char *output, ...){
-    printw(string);
+    printw("%s", string);
+    // addnstr(string, strlen(string));
+    // addstr(string);
 }
 
 void no_output_string_display(const char *string, ...){
-    printw(string);
+    printw("%s", string);
+    // addnstr(string, strlen(string));
+    // addstr(string);
     refresh();
 }
 

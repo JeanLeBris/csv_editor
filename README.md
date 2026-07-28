@@ -77,6 +77,8 @@ cd ..
 
 ```csv_editor.exe [-i | --input] file.csv [-sep | --separator] ";"``` : Open file.csv with ';' as the separator value between the cells
 
+```csv_editor.exe [-i | --input] file.csv [-e | --encoding] UTF-8``` : Open file.csv encoded with UTF-8
+
 ```csv_editor.exe [-i | --input] file.csv --show-config``` : Display the configuration of the program
 
 ## Configuration
@@ -165,7 +167,9 @@ If you are on the `SELECTION` or the `MOVE` mode and type the Esc key, you will 
 
 If you want to quit without saving, you can use the `:q` command.
 
-If you want to save and quit, you can use the `:wq` command.
+If you want to save, you can use the `:w` command, you can also add a file path behind to save in a different file than the input one like this : `:w [file_name]`.
+
+If you want to save and quit, you can use the `:wq` command, you can also add a file path behind to save in a different file than the input one like this : `:wq [file_name]`.
 
 If you want to move around faster, you can use the `:jump` command and go to the nth row using the following format :
 ```
@@ -181,6 +185,22 @@ If you want to insert a new line below the one you are currently on, you can use
 ```
 :new line
 ```
+
+It is also possible to execute more complicated commands with the `:exec()` keyword, mostly for debugging purposes.
+
+#### The `exec()` command
+
+This command allows the user to fetch information from the program itself, most notably to debug some functionalities.
+
+The `get [variable]` keyword can fetch some variables' content, like for the example the `column_types`, which fetch the type associated to each columns.
+
+The `> [file]` keyword can write information to a file.
+
+By associating these commands to each other you can get results like this :
+```
+:exec(get column_types > output.txt)
+```
+Which gets the types of each columns and write them to a file called `output.txt`
 
 ### The INSERT mode
 
@@ -199,3 +219,19 @@ If you have selected a cell, you will be able to move it up, down, left or right
 If you have selected a row, you will be able to move it up and down and if you have selected a column you will be able to move it left and right.
 
 To put down the selected element, you can type the 'm' key to return to the `SELECTION` mode or you can type the Esc key to go back to the `COMMAND` mode.
+
+## Encoding support by platform
+
+### For Windows
+
+| Encoding | Input | Output |
+|:--------:|:-----:|:------:|
+| DOS | <span style="color:green">Supported</span> | <span style="color:green">Supported</span> |
+| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:green">Supported</span> |
+
+### For Linux
+
+| Encoding | Input | Output |
+|:--------:|:-----:|:------:|
+| DOS | <span style="color:green">Supported</span> | <span style="color:green">Supported</span> |
+| UTF-8 | <span style="color:red">Not supported</span> | <span style="color:green">Supported</span> |

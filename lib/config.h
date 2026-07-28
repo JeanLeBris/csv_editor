@@ -2,6 +2,8 @@
 
 #define __CONFIG__
 
+#include "constants.h"
+
 typedef struct config_type{
     char installation_directory[101];
 
@@ -28,6 +30,8 @@ typedef struct config_type{
     char output_separator;
 
     int commands_history_length;
+
+    int encoding;
 
     char input_file[200];
 

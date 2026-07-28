@@ -19,4 +19,7 @@
 #define REGULAR_TEXT    0b00000100
 #define IMPORTANT_TEXT  0b00001000
 
+#define ENCODING_ASCII  0
+#define ENCODING_UTF8   1
+
 #endif
